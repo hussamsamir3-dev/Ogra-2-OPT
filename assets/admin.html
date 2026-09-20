@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#070b14">
+<title>Ogra Control Room</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --night:#070b14; --deck:#0c1322; --panel:#111a2c; --panel2:#16213a; --line:rgba(140,190,255,.12); --line2:rgba(140,190,255,.22);
+  --tx:#e6ecf7; --mut:#8d9ab2; --dim:#5d6a82;
+  --amber:#ffb627; --amber2:#ffd98a; --cyan:#2ee6ff; --ok:#39f28b; --bad:#ff4d5e; --warn:#ff9f43; --dev:#b18cff;
+  --r1:8px; --r2:14px;
+  --num:Rajdhani,Cairo,system-ui,sans-serif; --txt:Cairo,system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--night);color:var(--tx);font:14px/1.5 var(--txt)}
+body{background:radial-gradient(1200px 600px at 85% -10%,rgba(255,182,39,.07),transparent 60%),radial-gradient(900px 500px at -10% 110%,rgba(46,230,255,.05),transparent 60%),var(--night)}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;border:0;background:none}
+:focus-visible{outline:2px solid var(--cyan);outline-offset:2px;border-radius:6px}
+a{color:var(--cyan)}
+.hidden{display:none!important}
+.num{font-family:var(--num);font-variant-numeric:tabular-nums;letter-spacing:.01em}
+::-webkit-scrollbar{width:10px;height:10px}::-webkit-scrollbar-thumb{background:#22304c;border-radius:10px;border:2px solid var(--night)}
+
+/* ---------- sign-in ---------- */
+#login{position:fixed;inset:0;display:grid;grid-template-columns:1.1fr 1fr;background:var(--night)}
+#login .art{position:relative;overflow:hidden;background:#0a1020}
+#login .art canvas{position:absolute;inset:0;width:100%;height:100%}
+#login .art .cap{position:absolute;left:48px;bottom:44px;right:48px}
+#login .art .cap b{display:block;font:700 56px/1 var(--num);color:var(--amber2);letter-spacing:.02em}
+#login .art .cap span{color:var(--mut);font-size:15px}
+#login .lform{display:grid;place-items:center;padding:32px}
+#login form{width:min(380px,100%)}
+#login h1{font:700 30px/1.1 var(--num);margin:0 0 6px;letter-spacing:.02em}
+#login p{color:var(--mut);margin:0 0 26px}
+.field{display:block;margin:0 0 14px}
+.field span{display:block;color:var(--mut);font-size:12.5px;margin:0 0 6px;font-weight:600}
+.in{width:100%;padding:11px 13px;border-radius:10px;border:1px solid var(--line2);background:#0a1120;outline:none;transition:border-color .15s}
+.in:focus{border-color:var(--amber)}
+textarea.in{font:12.5px/1.55 ui-monospace,Menlo,Consolas,monospace;resize:vertical}
+select.in{appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--mut) 50%),linear-gradient(135deg,var(--mut) 50%,transparent 50%);background-position:calc(100% - 17px) 50%,calc(100% - 12px) 50%;background-size:5px 5px;background-repeat:no-repeat;padding-right:30px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:9px 15px;border-radius:10px;font-weight:700;border:1px solid var(--line2);background:var(--panel2);color:var(--tx);white-space:nowrap;transition:background .15s,border-color .15s,transform .05s}
+.btn:hover{border-color:rgba(140,190,255,.4);background:#1b2844}
+.btn:active{transform:translateY(1px)}
+.btn[disabled]{opacity:.45;pointer-events:none}
+.btn.pri{background:linear-gradient(180deg,var(--amber2),var(--amber));color:#1b1204;border-color:transparent}
+.btn.pri:hover{filter:brightness(1.05)}
+.btn.danger{color:#ffd3d7;border-color:rgba(255,77,94,.45);background:rgba(255,77,94,.1)}
+.btn.danger:hover{background:rgba(255,77,94,.2)}
+.btn.good{color:#c9ffe0;border-color:rgba(57,242,139,.4);background:rgba(57,242,139,.09)}
+.btn.devb{color:#e4d6ff;border-color:rgba(177,140,255,.45);background:rgba(177,140,255,.1)}
+.btn.sm{padding:5px 10px;font-size:12.5px;border-radius:8px}
+.btn.wide{width:100%;padding:12px}
+.err{color:#ff9ea7;font-size:13px;min-height:1.4em;margin-top:10px}
+
+/* ---------- shell ---------- */
+#app{display:grid;grid-template-columns:232px 1fr;height:100%}
+aside{border-right:1px solid var(--line);background:rgba(8,12,22,.7);display:flex;flex-direction:column;padding:18px 12px}
+.brand{display:flex;align-items:center;gap:10px;padding:4px 8px 22px}
+.brand .mk{width:36px;height:36px;border-radius:10px;background:linear-gradient(160deg,var(--amber2),var(--amber));display:grid;place-items:center;color:#1b1204;font:700 20px/1 var(--num)}
+.brand b{font:700 19px/1 var(--num);letter-spacing:.03em;display:block}
+.brand small{color:var(--mut);font-size:11.5px}
+nav button{display:flex;align-items:center;gap:11px;width:100%;padding:10px 12px;border-radius:10px;color:var(--mut);font-weight:700;text-align:left;margin:2px 0}
+nav button svg{width:18px;height:18px;flex:none;opacity:.85}
+nav button:hover{background:rgba(140,190,255,.06);color:var(--tx)}
+nav button.on{background:rgba(255,182,39,.1);color:var(--amber2);box-shadow:inset 3px 0 0 var(--amber)}
+nav .cnt{margin-left:auto;font:700 12px/1 var(--num);padding:3px 7px;border-radius:20px;background:rgba(255,77,94,.18);color:#ffb3ba}
+nav .cnt:empty{display:none}
+aside .me{margin-top:auto;padding:12px;border-top:1px solid var(--line);font-size:12.5px;color:var(--mut)}
+aside .me b{display:block;color:var(--tx);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+main{overflow:auto;min-width:0}
+.top{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:14px;padding:14px 28px;background:rgba(7,11,20,.82);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.top h2{margin:0;font:700 22px/1 var(--num);letter-spacing:.02em}
+.top .sp{flex:1}
+.live{display:flex;align-items:center;gap:8px;color:var(--mut);font-size:12.5px}
+.live i{width:8px;height:8px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 0 rgba(57,242,139,.6);animation:pulse 2s infinite}
+.live.off i{background:var(--dim);animation:none}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(57,242,139,.55)}70%{box-shadow:0 0 0 8px rgba(57,242,139,0)}100%{box-shadow:0 0 0 0 rgba(57,242,139,0)}}
+@media (prefers-reduced-motion:reduce){.live i{animation:none}}
+.search{position:relative;width:min(340px,40vw)}
+.search input{padding-left:36px}
+.search svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--dim)}
+.page{padding:24px 28px 60px}
+.demo{background:rgba(177,140,255,.12);color:#dccfff;border:1px solid rgba(177,140,255,.3);padding:3px 9px;border-radius:20px;font-size:12px;font-weight:700}
+
+/* ---------- overview ---------- */
+.board{display:grid;grid-template-columns:1.3fr repeat(4,1fr);gap:12px;margin-bottom:14px}
+.kpi{background:var(--panel);border:1px solid var(--line);border-radius:var(--r2);padding:16px 18px;position:relative;overflow:hidden}
+.kpi .l{color:var(--mut);font-size:12.5px;font-weight:600}
+.kpi .v{font:700 34px/1.1 var(--num);margin-top:4px}
+.kpi .s{color:var(--dim);font-size:12px;margin-top:2px}
+.kpi.hero{background:linear-gradient(160deg,#18243d,#0f1728);border-color:rgba(255,182,39,.28)}
+.kpi.hero .v{font-size:64px;color:var(--amber2);line-height:1}
+.kpi.hero .dot{display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--ok);margin-right:8px;vertical-align:middle}
+.kpi.alert .v{color:#ff8a95}
+.grid2{display:grid;grid-template-columns:1.6fr 1fr;gap:12px;margin-bottom:12px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r2);padding:16px 18px;min-width:0}
+.card h3{margin:0 0 12px;font-size:14.5px;font-weight:800;display:flex;align-items:center;gap:10px}
+.card h3 small{color:var(--dim);font-weight:600;font-size:12px}
+.card h3 .sp{flex:1}
+.chart svg{width:100%;display:block}
+.legend{display:flex;gap:14px;color:var(--mut);font-size:12px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+.bars .row{display:grid;grid-template-columns:1fr 60px;gap:10px;align-items:center;margin:9px 0}
+.bars .track{height:8px;background:#0a1120;border-radius:6px;overflow:hidden;margin-top:5px}
+.bars .fill{height:100%;background:linear-gradient(90deg,var(--amber),var(--amber2));border-radius:6px}
+.bars .nm{font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bars .n{text-align:right;font:700 15px var(--num)}
+.mini{list-style:none;margin:0;padding:0}
+.mini li{display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid var(--line);cursor:pointer}
+.mini li:first-child{border-top:0}
+.mini li:hover .who b{color:var(--amber2)}
+.who{min-width:0;flex:1}
+.who b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13.5px}
+.who small{color:var(--dim);display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px}
+.empty{color:var(--dim);text-align:center;padding:26px 10px;font-size:13px}
+
+/* ---------- tables ---------- */
+.bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{padding:6px 12px;border-radius:20px;border:1px solid var(--line2);color:var(--mut);font-weight:700;font-size:13px}
+.chip.on{background:var(--tx);color:#0b1120;border-color:transparent}
+.chip b{font-family:var(--num);margin-left:4px;opacity:.8}
+.tbl{width:100%;border-collapse:separate;border-spacing:0;background:var(--panel);border:1px solid var(--line);border-radius:var(--r2);overflow:hidden}
+.tblwrap{overflow:auto;border-radius:var(--r2)}
+.tbl th{position:sticky;top:0;text-align:left;font-size:12px;font-weight:700;color:var(--mut);padding:11px 12px;background:#131d31;border-bottom:1px solid var(--line);white-space:nowrap}
+.tbl td{padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:middle;white-space:nowrap}
+.tbl tr:last-child td{border-bottom:0}
+.tbl tbody tr{cursor:pointer;transition:background .1s}
+.tbl tbody tr:hover{background:rgba(140,190,255,.045)}
+.tbl td.r,.tbl th.r{text-align:right}
+.tbl .who{max-width:260px}
+.av{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;font:700 14px var(--num);color:#0b1120;flex:none;position:relative}
+.av .st{position:absolute;right:-3px;bottom:-3px;width:11px;height:11px;border-radius:50%;border:2px solid var(--panel);background:var(--dim)}
+.av .st.on{background:var(--ok)}
+.pill{display:inline-flex;align-items:center;gap:5px;padding:2px 8px;border-radius:20px;font-size:11.5px;font-weight:800;line-height:1.6}
+.pill.bad{background:rgba(255,77,94,.15);color:#ff9aa4}
+.pill.ok{background:rgba(57,242,139,.13);color:#8ff5b9}
+.pill.dev{background:rgba(177,140,255,.16);color:#d3c0ff}
+.pill.warn{background:rgba(255,159,67,.15);color:#ffc28a}
+.pill.mut{background:rgba(140,190,255,.09);color:var(--mut)}
+.pill.amb{background:rgba(255,182,39,.14);color:var(--amber2)}
+.pager{display:flex;align-items:center;gap:10px;justify-content:flex-end;margin-top:12px;color:var(--mut);font-size:13px}
+
+/* ---------- drawer ---------- */
+#scrim{position:fixed;inset:0;background:rgba(3,6,12,.55);z-index:20;opacity:0;pointer-events:none;transition:opacity .2s}
+#scrim.on{opacity:1;pointer-events:auto}
+#drawer{position:fixed;top:0;right:0;bottom:0;width:min(820px,100vw);background:var(--deck);border-left:1px solid var(--line2);z-index:21;transform:translateX(102%);transition:transform .24s cubic-bezier(.2,.8,.2,1);display:flex;flex-direction:column;box-shadow:-30px 0 80px rgba(0,0,0,.45)}
+#drawer.on{transform:none}
+@media (prefers-reduced-motion:reduce){#drawer,#scrim{transition:none}}
+.dh{padding:20px 24px 0;border-bottom:1px solid var(--line)}
+.dh .row1{display:flex;gap:14px;align-items:center}
+.dh .av{width:54px;height:54px;border-radius:14px;font-size:22px}
+.dh h2{margin:0;font:700 24px/1.1 var(--num);letter-spacing:.01em}
+.dh .meta{color:var(--mut);font-size:12.5px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:3px}
+.dh .x{margin-left:auto;align-self:flex-start;width:36px;height:36px;border-radius:10px;border:1px solid var(--line2);font-size:18px;color:var(--mut)}
+.dh .x:hover{color:var(--tx)}
+.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:16px 0}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:9px 12px}
+.stat span{display:block;color:var(--dim);font-size:11.5px;font-weight:600}
+.stat b{font:700 20px/1.2 var(--num)}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 14px}
+.tabs{display:flex;gap:2px;overflow-x:auto}
+.tabs button{padding:10px 14px;color:var(--mut);font-weight:700;border-bottom:2px solid transparent;white-space:nowrap}
+.tabs button.on{color:var(--amber2);border-color:var(--amber)}
+.tabs button b{font-family:var(--num);margin-left:5px;color:var(--dim)}
+.db{flex:1;overflow:auto;padding:20px 24px 90px}
+.banbox{background:rgba(255,77,94,.08);border:1px solid rgba(255,77,94,.35);border-radius:12px;padding:12px 14px;margin:14px 0 0;display:flex;gap:12px;align-items:center}
+.banbox b{color:#ffb3ba}
+.devbox{background:rgba(177,140,255,.08);border:1px solid rgba(177,140,255,.35);border-radius:12px;padding:12px 14px;margin:14px 0 0;color:#dccfff}
+.form{display:grid;grid-template-columns:repeat(3,1fr);gap:12px 14px}
+.form .span2{grid-column:span 2}.form .span3{grid-column:1/-1}
+.form .field{margin:0}
+.field.changed .in{border-color:var(--amber);background:rgba(255,182,39,.05)}
+.sticky{position:sticky;bottom:-90px;margin:18px -24px -90px;padding:14px 24px;background:rgba(12,19,34,.96);border-top:1px solid var(--line);display:flex;gap:10px;align-items:center}
+.sticky .sp{flex:1}
+.vgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+.veh{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 13px;display:flex;flex-direction:column;gap:8px}
+.veh.own{border-color:rgba(57,242,139,.35)}
+.veh.cur{box-shadow:inset 0 0 0 1px var(--amber);border-color:var(--amber)}
+.veh .h{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
+.veh .h b{font-size:13.5px;line-height:1.3}
+.veh .h small{display:block;color:var(--dim);font-size:11.5px}
+.veh .f{display:flex;gap:6px;flex-wrap:wrap}
+.flag{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:start;padding:12px 0;border-top:1px solid var(--line)}
+.flag:first-child{border-top:0}
+.flag pre{margin:6px 0 0;padding:8px 10px;background:#0a1120;border-radius:8px;font-size:11.5px;color:#aebad0;white-space:pre-wrap;word-break:break-word;max-height:140px;overflow:auto}
+.sev{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;font:700 16px var(--num)}
+.sev.s1{background:rgba(140,190,255,.1);color:var(--mut)}.sev.s2{background:rgba(255,159,67,.15);color:#ffc28a}.sev.s3{background:rgba(255,77,94,.18);color:#ff9aa4}
+
+/* ---------- modal & toast ---------- */
+#modal{position:fixed;inset:0;z-index:40;display:grid;place-items:center;background:rgba(3,6,12,.66);backdrop-filter:blur(4px);padding:20px}
+.mbox{width:min(520px,100%);background:var(--deck);border:1px solid var(--line2);border-radius:18px;padding:22px;box-shadow:0 30px 80px rgba(0,0,0,.6)}
+.mbox h3{margin:0 0 4px;font:700 22px/1.2 var(--num)}
+.mbox p{margin:0 0 16px;color:var(--mut)}
+.mbox .foot{display:flex;gap:10px;justify-content:flex-end;margin-top:18px}
+.opts{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+.opt{padding:10px;border-radius:10px;border:1px solid var(--line2);font-weight:700;text-align:center}
+.opt.on{border-color:var(--bad);background:rgba(255,77,94,.12);color:#ffc5cb}
+#toasts{position:fixed;right:20px;bottom:20px;z-index:60;display:flex;flex-direction:column;gap:8px;align-items:flex-end}
+.toast{background:#18233b;border:1px solid var(--line2);border-left:3px solid var(--ok);padding:10px 14px;border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,.4);max-width:420px;font-weight:600}
+.toast.bad{border-left-color:var(--bad)}
+
+.split{display:grid;grid-template-columns:380px 1fr;gap:14px;align-items:start}
+.hint{color:var(--dim);font-size:12.5px;margin-top:8px}
+code{font:12px ui-monospace,Menlo,monospace;background:#0a1120;padding:2px 6px;border-radius:6px;color:#c7d3ea}
+.kbd{border:1px solid var(--line2);border-bottom-width:2px;border-radius:6px;padding:0 6px;font:12px var(--num);color:var(--mut)}
+
+@media (max-width:1180px){.board{grid-template-columns:repeat(3,1fr)}.kpi.hero{grid-column:span 3}.grid2,.split{grid-template-columns:1fr}.stats{grid-template-columns:repeat(3,1fr)}}
+@media (max-width:820px){#app{grid-template-columns:1fr}aside{position:fixed;inset:auto 0 0 0;flex-direction:row;padding:6px;z-index:10;border-right:0;border-top:1px solid var(--line)}aside .brand,aside .me{display:none}nav{display:flex;width:100%;overflow-x:auto}nav button{flex-direction:column;gap:2px;font-size:11px;padding:6px 10px}nav button.on{box-shadow:inset 0 -3px 0 var(--amber)}nav .cnt{display:none}.page{padding:16px 14px 90px}.top{padding:12px 14px}.search{width:auto;flex:1}.form{grid-template-columns:1fr 1fr}#login{grid-template-columns:1fr}#login .art{display:none}.board{grid-template-columns:1fr 1fr}.kpi.hero{grid-column:span 2}}
+</style>
+</head>
+<body>
+
+<!-- ================= SIGN IN ================= -->
+<section id="login">
+  <div class="art"><canvas id="skyline"></canvas>
+    <div class="cap"><b>OGRA CONTROL ROOM</b><span>Every driver, every fare, every flag — watched from one desk.</span></div>
+  </div>
+  <div class="lform">
+    <form id="loginForm" autocomplete="on">
+      <h1>Admin sign in</h1>
+      <p>Use the same account you play Ogra with. It must be listed as an admin.</p>
+      <label class="field"><span>Email</span><input class="in" id="lEmail" type="email" autocomplete="username" required></label>
+      <label class="field"><span>Password</span><input class="in" id="lPass" type="password" autocomplete="current-password" required></label>
+      <button class="btn pri wide" id="lBtn" type="submit">Sign in</button>
+      <div class="err" id="lErr"></div>
+      <div class="hint">Preview without a database: <a href="?demo=1">open demo data</a></div>
+    </form>
+  </div>
+</section>
+
+<!-- ================= APP ================= -->
+<div id="app" class="hidden">
+  <aside>
+    <div class="brand"><div class="mk">O</div><div><b>OGRA</b><small>Control room</small></div></div>
+    <nav id="nav"></nav>
+    <div class="me"><b id="meEmail"></b><span id="meRole">Admin</span><div style="margin-top:8px"><button class="btn sm" id="signOut">Sign out</button></div></div>
+  </aside>
+  <main>
+    <div class="top">
+      <h2 id="viewTitle">Overview</h2>
+      <span id="demoTag" class="demo hidden">Demo data</span>
+      <div class="sp"></div>
+      <div class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input class="in" id="gSearch" placeholder="Find a player by email, name or ID"></div>
+      <div class="live" id="live"><i></i><span id="liveTxt">Live</span></div>
+    </div>
+    <div class="page" id="page"></div>
+  </main>
+</div>
+
+<div id="scrim"></div>
+<section id="drawer" aria-label="Player"></section>
+<div id="modal" class="hidden"></div>
+<div id="toasts"></div>
+
+<script src="assets/supabase.js"></script>
+<script>
+/* ================= CONFIG ================= */
+const CFG = {
+  url: 'https://zmbyrpiiqvfrmszvhvvh.supabase.co',
+  key: 'sb_publishable_pTIK6OotwX1_23Xyy2sQfw_6GAJIu6K',
+  refreshMs: 20000,
+  onlineWindowMs: 120000
+};
+const VEHICLES = [
+  ['v_n300','Chevrolet N300 Van','micro',11,1],['v_suzuki','Suzuki Every Minivan','micro',7,1],['v_foton','Foton Gratour Mini','micro',8,2],
+  ['van_euro','Foton Toano Long','micro',14,4],['micro_classic','Toyota HiAce H200','micro',14,5],['micro_hr','King Long Kingo Wide','micro',15,6],
+  ['micro_jumbo','Golden Dragon 6532','micro',16,7],['v_shineray','Foton View CS2','minibus',18,8],['van_xl','King Long Kingo 6600','minibus',19,8],
+  ['v_joya6','Joylong Joya 6','minibus',19,9],['mini_rosa','Mitsubishi Fuso Rosa','minibus',25,10],['coaster','Toyota Coaster B70','minibus',26,11],
+  ['v_isuzu','Isuzu NPR Bus','minibus',28,12],['v_higer','Higer KLQ6728','minibus',29,12],['v_yutong77','Yutong ZK6770','minibus',30,13],
+  ['citybus','King Long XMQ6127','bus',35,15],['v_zk6128','Yutong ZK6128HG','bus',38,16],['coach','Golden Dragon Navigator 6125','bus',49,19],
+  ['v_tourismo','Mercedes-Benz Tourismo RHD','bus',51,22],
+  ['car_old','Fiat 128 Nasr','car',3,1],['hatch_city','Lada 2107 Riva','car',3,2],['sedan_compact','Daewoo Lanos (Nasr)','car',4,3],
+  ['hatch','Hyundai Verna','car',3,4],['sedan16','Chevrolet Optra','car',4,7],['sedan_mid','Toyota Corolla 1.8','car',4,9]
+];
+const VNAME = Object.fromEntries(VEHICLES.map(v => [v[0], v[1]]));
+const ROUTE_NAMES = {cairo_hurghada:'Cairo → Hurghada',cairo_gouna:'Cairo → El Gouna',cairo_sharm:'Cairo → Sharm El Sheikh',maadi_tahrir:'Maadi → Tahrir',giza_haram:'Giza Square → Pyramids',ramses_hussein:'Ramses → El Hussein',asher_ramses:'El Hay El Asher → Ramses',alex_corniche:'Raml Station → Montaza',asher_shorouk:'El Hay El Asher → El Shorouk',asher_capital:'El Hay El Asher → New Capital',banha:'El Mo’assasa → Banha',cairo_sokhna:'Qattameya → Ain Sokhna',cairo_alex:'El Mo’assasa → Moharram Bek',bus_tahrir_korba:'Abdel Moneim Riad → Korba',bus_ramses_haram:'Ramses → Pyramids',mini_ramses_october:'Ramses → El Hosary',coach_cairo_alex:'Cairo Gateway → Sidi Gaber'};
+
+/* ================= UTIL ================= */
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt = n => n == null ? '—' : Number(n).toLocaleString('en-US');
+const egp = n => n == null ? '—' : 'EGP ' + fmt(Math.round(n));
+const short = n => { n = Number(n) || 0; const a = Math.abs(n); return a >= 1e9 ? (n/1e9).toFixed(1)+'B' : a >= 1e6 ? (n/1e6).toFixed(a >= 1e7 ? 0 : 1)+'M' : a >= 1e4 ? (n/1e3).toFixed(0)+'K' : fmt(n); };
+const ago = t => { if (!t) return 'never'; const s = (Date.now() - new Date(t))/1000; if (s < 0) return 'in ' + until(t); if (s < 60) return 'just now'; if (s < 3600) return Math.floor(s/60)+' min ago'; if (s < 86400) return Math.floor(s/3600)+' h ago'; if (s < 86400*30) return Math.floor(s/86400)+' d ago'; return new Date(t).toLocaleDateString(); };
+const until = t => { const s = (new Date(t) - Date.now())/1000; if (new Date(t).getFullYear() > 9000) return 'permanent'; if (s < 3600) return Math.max(1, Math.ceil(s/60))+' min'; if (s < 86400) return Math.ceil(s/3600)+' h'; return Math.ceil(s/86400)+' days'; };
+const dt = t => t ? new Date(t).toLocaleString([], {dateStyle:'medium', timeStyle:'short'}) : '—';
+const isOnline = p => p.last_seen && Date.now() - new Date(p.last_seen) < CFG.onlineWindowMs;
+const isBanned = p => p.banned_until && new Date(p.banned_until) > new Date();
+const hue = s => { let h = 0; for (const c of String(s)) h = (h*31 + c.charCodeAt(0)) >>> 0; return h % 360; };
+const initials = p => ((p.name || p.email || '?').replace(/@.*/, '').split(/[\s._-]+/).filter(Boolean).slice(0, 2).map(w => w[0]).join('') || '?').toUpperCase();
+const avatar = (p, big) => `<div class="av" style="background:hsl(${hue(p.id)},70%,${big ? 72 : 70}%)">${esc(initials(p))}<i class="st ${isOnline(p) ? 'on' : ''}"></i></div>`;
+function toast(msg, bad){ const t = document.createElement('div'); t.className = 'toast' + (bad ? ' bad' : ''); t.textContent = msg; $('#toasts').appendChild(t); setTimeout(() => t.remove(), bad ? 6500 : 3200); }
+const ICON = {
+  overview:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="2"/><rect x="14" y="3" width="7" height="5" rx="2"/><rect x="14" y="12" width="7" height="9" rx="2"/><rect x="3" y="16" width="7" height="5" rx="2"/></svg>',
+  players:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="4"/><path d="M2 21c0-4 3-6 7-6s7 2 7 6"/><path d="M16 4a4 4 0 0 1 0 8M22 21c0-3-2-5-4-5.6"/></svg>',
+  flags:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 21V4h11l-1.5 4L16 12H5"/></svg>',
+  trips:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="6" width="18" height="11" rx="3"/><circle cx="7.5" cy="18" r="1.8"/><circle cx="16.5" cy="18" r="1.8"/><path d="M3 11h18M9 6v5M15 6v5"/></svg>',
+  devs:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m8 8-5 4 5 4M16 8l5 4-5 4M14 5l-4 14"/></svg>',
+  admins:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6z"/><path d="m9 12 2 2 4-4"/></svg>',
+  audit:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 4h11v16H5V7z"/><path d="M9 9h6M9 13h6M9 17h4"/></svg>'
+};
+
+/* ================= BACKEND ================= */
+const DEMO = new URLSearchParams(location.search).has('demo');
+const API = {
+  sb: null,
+  async rpc(fn, args){
+    if (DEMO) return MOCK.rpc(fn, args || {});
+    const { data, error } = await this.sb.rpc(fn, args || {});
+    if (error) throw new Error(error.message);
+    return data;
+  },
+  async account(body){
+    if (DEMO) return MOCK.account(body);
+    const { data: s } = await this.sb.auth.getSession();
+    const r = await fetch(CFG.url + '/functions/v1/admin-account', { method:'POST',
+      headers:{ 'content-type':'application/json', apikey:CFG.key, authorization:'Bearer ' + (s.session && s.session.access_token) }, body:JSON.stringify(body) });
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(j.error || ('HTTP ' + r.status + (r.status === 404 ? ' — deploy the admin-account function' : '')));
+    return j;
+  }
+};
+
+/* ================= STATE ================= */
+const ST = { view:'overview', dash:null, pf:{search:'', filter:'all', sort:'last_seen', offset:0, limit:50}, player:null, ptab:'profile', timer:null, busy:false };
+const VIEWS = [['overview','Overview'],['players','Players'],['flags','Flags'],['trips','Trips'],['devs','Dev accounts'],['admins','Admins'],['audit','Audit log']];
+
+/* ================= BOOT ================= */
+async function boot(){
+  drawSkyline();
+  if (DEMO) { $('#demoTag').classList.remove('hidden'); return enter({ email:'demo-admin@ogra.app' }); }
+  if (!window.supabase) { $('#lErr').textContent = 'Could not load assets/supabase.js. Put admin.html in the same folder as the game.'; return; }
+  API.sb = window.supabase.createClient(CFG.url, CFG.key);
+  const { data } = await API.sb.auth.getSession();
+  if (data.session) await checkAdmin();
+  $('#loginForm').onsubmit = async e => { e.preventDefault(); $('#lErr').textContent = ''; $('#lBtn').disabled = true;
+    const { error } = await API.sb.auth.signInWithPassword({ email:$('#lEmail').value.trim(), password:$('#lPass').value });
+    $('#lBtn').disabled = false;
+    if (error) { $('#lErr').textContent = error.message; return; }
+    await checkAdmin(); };
+}
+async function checkAdmin(){
+  try { const me = await API.rpc('admin_whoami');
+    if (!me || !me.is_admin) { $('#lErr').innerHTML = 'Signed in as <b>' + esc(me && me.email) + '</b>, but this account is not an admin. Add it with the bootstrap line at the bottom of <code>admin.sql</code>.'; await API.sb.auth.signOut(); return; }
+    enter(me);
+  } catch (e) { $('#lErr').textContent = /admin_whoami/.test(e.message) ? 'The admin functions are not installed. Run admin.sql in the Supabase SQL editor.' : e.message; }
+}
+function enter(me){
+  $('#login').classList.add('hidden'); $('#app').classList.remove('hidden');
+  $('#meEmail').textContent = me.email || '';
+  $('#nav').innerHTML = VIEWS.map(([k, n]) => `<button data-v="${k}">${ICON[k]}<span>${n}</span><i class="cnt" id="cnt_${k}"></i></button>`).join('');
+  $('#nav').onclick = e => { const b = e.target.closest('[data-v]'); if (b) go(b.dataset.v); };
+  $('#signOut').onclick = async () => { if (!DEMO) await API.sb.auth.signOut(); location.href = location.pathname; };
+  let st; $('#gSearch').oninput = e => { clearTimeout(st); st = setTimeout(() => { ST.pf.search = e.target.value.trim(); ST.pf.offset = 0; go('players'); }, 250); };
+  $('#scrim').onclick = closeDrawer;
+  addEventListener('keydown', e => { if (e.key === 'Escape') { if (!$('#modal').classList.contains('hidden')) closeModal(); else closeDrawer(); }
+    if (e.key === '/' && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') { e.preventDefault(); $('#gSearch').focus(); } });
+  go(location.hash.slice(1) || 'overview');
+  ST.timer = setInterval(tick, CFG.refreshMs);
+  document.addEventListener('visibilitychange', () => { $('#live').classList.toggle('off', document.hidden); if (!document.hidden) tick(); });
+}
+async function tick(){
+  if (document.hidden || ST.busy || !$('#modal').classList.contains('hidden')) return;
+  const editing = $('#drawer').classList.contains('on') && document.querySelector('#drawer .field.changed, #drawer textarea:focus');
+  try { await render(true); if ($('#drawer').classList.contains('on') && !editing) await openPlayer(ST.player.player.id, true); $('#liveTxt').textContent = 'Live · ' + new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit', second:'2-digit'}); } catch (e) {}
+}
+function go(v){ if (!VIEWS.find(x => x[0] === v)) v = 'overview'; ST.view = v; history.replaceState(null, '', '#' + v);
+  document.querySelectorAll('#nav button').forEach(b => b.classList.toggle('on', b.dataset.v === v));
+  $('#viewTitle').textContent = VIEWS.find(x => x[0] === v)[1]; render(); }
+async function render(silent){
+  const page = $('#page');
+  if (!silent) page.innerHTML = '<div class="empty">Loading…</div>';
+  try {
+    ST.dash = await API.rpc('admin_dashboard');
+    $('#cnt_flags').textContent = ST.dash.open_flags || '';
+    const html = await VIEW_RENDER[ST.view]();
+    if (silent && (document.activeElement && page.contains(document.activeElement) && /INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName))) return;
+    page.innerHTML = html; (VIEW_AFTER[ST.view] || (() => {}))();
+  } catch (e) { if (!silent) page.innerHTML = `<div class="card"><div class="empty">Could not load: ${esc(e.message)}</div></div>`; toast(e.message, true); }
+}
+
+/* ================= CHARTS ================= */
+function barChart(data){
+  const W = 760, H = 210, pl = 34, pb = 24, pt = 10, n = data.length, max = Math.max(4, ...data.map(d => d.ok + d.bad));
+  const bw = (W - pl)/n, sy = v => (H - pb - pt)*v/max;
+  let g = '';
+  for (let i = 0; i <= 4; i++) { const y = H - pb - (H - pb - pt)*i/4; g += `<line x1="${pl}" x2="${W}" y1="${y}" y2="${y}" stroke="rgba(140,190,255,.08)"/><text x="${pl - 8}" y="${y + 4}" fill="#5d6a82" font-size="11" text-anchor="end" font-family="Rajdhani">${Math.round(max*i/4)}</text>`; }
+  data.forEach((d, i) => { const x = pl + i*bw + bw*.18, w = bw*.64, h1 = sy(d.ok), h2 = sy(d.bad);
+    g += `<rect x="${x}" y="${H - pb - h1}" width="${w}" height="${h1}" rx="2" fill="#ffb627"><title>${new Date(d.t).getHours()}:00 — ${d.ok} accepted, ${d.bad} rejected</title></rect>`;
+    if (h2) g += `<rect x="${x}" y="${H - pb - h1 - h2}" width="${w}" height="${h2}" rx="2" fill="#ff4d5e"/>`;
+    if (i % 3 === 0) g += `<text x="${x + w/2}" y="${H - 6}" fill="#5d6a82" font-size="11" text-anchor="middle" font-family="Rajdhani">${String(new Date(d.t).getHours()).padStart(2, '0')}:00</text>`; });
+  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Trips per hour">${g}</svg>`;
+}
+function lineChart(data){
+  const W = 420, H = 210, pl = 26, pb = 24, pt = 14, max = Math.max(3, ...data.map(d => d.n)), n = data.length;
+  const X = i => pl + (W - pl - 8)*i/(n - 1), Y = v => H - pb - (H - pb - pt)*v/max;
+  const pts = data.map((d, i) => [X(i), Y(d.n)]), path = pts.map((p, i) => (i ? 'L' : 'M') + p[0].toFixed(1) + ',' + p[1].toFixed(1)).join('');
+  let g = '';
+  for (let i = 0; i <= 3; i++) { const y = Y(max*i/3); g += `<line x1="${pl}" x2="${W}" y1="${y}" y2="${y}" stroke="rgba(140,190,255,.08)"/><text x="${pl - 6}" y="${y + 4}" fill="#5d6a82" font-size="11" text-anchor="end" font-family="Rajdhani">${Math.round(max*i/3)}</text>`; }
+  g += `<defs><linearGradient id="lg" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#2ee6ff" stop-opacity=".35"/><stop offset="1" stop-color="#2ee6ff" stop-opacity="0"/></linearGradient></defs>`;
+  g += `<path d="${path}L${X(n - 1)},${H - pb}L${X(0)},${H - pb}Z" fill="url(#lg)"/><path d="${path}" fill="none" stroke="#2ee6ff" stroke-width="2.2" stroke-linejoin="round"/>`;
+  pts.forEach((p, i) => { g += `<circle cx="${p[0]}" cy="${p[1]}" r="3" fill="#070b14" stroke="#2ee6ff" stroke-width="2"><title>${data[i].d}: ${data[i].n}</title></circle>`;
+    if (i % 3 === 1 || i === n - 1) g += `<text x="${p[0]}" y="${H - 6}" fill="#5d6a82" font-size="11" text-anchor="middle" font-family="Rajdhani">${new Date(data[i].d).toLocaleDateString([], {day:'numeric', month:'short'})}</text>`; });
+  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Sign-ups per day">${g}</svg>`;
+}
+
+/* ================= VIEWS ================= */
+const VIEW_AFTER = {};
+const VIEW_RENDER = {
+  async overview(){
+    const d = ST.dash;
+    const [online, flags] = await Promise.all([API.rpc('admin_players', {p_search:'', p_filter:'online', p_sort:'last_seen', p_limit:8, p_offset:0}), API.rpc('admin_flags', {p_open_only:true, p_limit:6})]);
+    const topMax = Math.max(1, ...(d.top_routes || []).map(r => r.n));
+    return `
+    <div class="board">
+      <div class="kpi hero"><div class="l"><span class="dot" style="${d.online ? '' : 'background:var(--dim)'}"></span>Driving right now</div><div class="v num">${fmt(d.online)}</div><div class="s">${fmt(d.active_24h)} active in the last 24 h · ${fmt(d.players)} accounts</div></div>
+      <div class="kpi"><div class="l">Trips, 24 h</div><div class="v num">${fmt(d.trips_24h)}</div><div class="s">${fmt(d.rejected_24h)} rejected by the server</div></div>
+      <div class="kpi"><div class="l">Paid out, 24 h</div><div class="v num">${short(d.earned_24h)}</div><div class="s">EGP net to drivers</div></div>
+      <div class="kpi ${d.open_flags ? 'alert' : ''}"><div class="l">Open flags</div><div class="v num">${fmt(d.open_flags)}</div><div class="s">${fmt(d.banned)} accounts banned</div></div>
+      <div class="kpi"><div class="l">Cash in circulation</div><div class="v num">${short(d.cash_total)}</div><div class="s">${fmt(d.new_24h)} new · ${fmt(d.devs)} dev accounts</div></div>
+    </div>
+    <div class="grid2">
+      <div class="card chart"><h3>Trips per hour <small>last 24 h</small><span class="sp"></span><span class="legend"><span><i style="background:#ffb627"></i>Accepted</span><span><i style="background:#ff4d5e"></i>Rejected</span></span></h3>${barChart(d.trips_by_hour || [])}</div>
+      <div class="card chart"><h3>New players <small>14 days</small></h3>${lineChart(d.signups_by_day || [])}</div>
+    </div>
+    <div class="grid2" style="grid-template-columns:1fr 1fr 1fr">
+      <div class="card"><h3>On the road now</h3>${online.rows.length ? `<ul class="mini">${online.rows.map(p => `<li data-p="${esc(p.id)}">${avatar(p)}<div class="who"><b>${esc(p.name || p.email)}</b><small>Level ${p.level} · ${egp(p.cash)}</small></div>${p.is_dev ? '<span class="pill dev">DEV</span>' : ''}</li>`).join('')}</ul>` : '<div class="empty">Nobody is driving at the moment.</div>'}</div>
+      <div class="card"><h3>Latest flags<span class="sp"></span><button class="btn sm" data-go="flags">Open queue</button></h3>${flags.length ? `<ul class="mini">${flags.map(f => `<li data-p="${esc(f.player_id)}"><div class="sev s${Math.min(3, f.severity || 1)}">${f.severity || 1}</div><div class="who"><b>${esc(f.kind.replace(/_/g, ' '))}</b><small>${esc(f.email || f.player_id)} · ${ago(f.created_at)}</small></div></li>`).join('')}</ul>` : '<div class="empty">No open flags. The roads are clean.</div>'}</div>
+      <div class="card bars"><h3>Busiest routes <small>7 days</small></h3>${(d.top_routes || []).length ? d.top_routes.map(r => `<div class="row"><div><div class="nm">${esc(ROUTE_NAMES[r.route_id] || r.route_id)}</div><div class="track"><div class="fill" style="width:${r.n/topMax*100}%"></div></div></div><div class="n">${fmt(r.n)}</div></div>`).join('') : '<div class="empty">No trips yet.</div>'}</div>
+    </div>`;
+  },
+
+  async players(){
+    const f = ST.pf, d = ST.dash;
+    const res = await API.rpc('admin_players', {p_search:f.search, p_filter:f.filter, p_sort:f.sort, p_limit:f.limit, p_offset:f.offset});
+    ST.lastPlayers = res.rows;
+    const chips = [['all','All',d.players],['online','Online',d.online],['flagged','Flagged',null],['banned','Banned',d.banned],['dev','Dev',d.devs]];
+    return `
+    <div class="bar">
+      <div class="chips">${chips.map(([k, n, c]) => `<button class="chip ${f.filter === k ? 'on' : ''}" data-filter="${k}">${n}${c != null ? `<b>${fmt(c)}</b>` : ''}</button>`).join('')}</div>
+      <div style="flex:1"></div>
+      <select class="in" id="pSort" style="width:auto"><option value="last_seen">Last seen</option><option value="new">Newest</option><option value="cash">Most cash</option><option value="level">Highest level</option><option value="trips">Most trips</option><option value="flags">Most flags</option></select>
+      <button class="btn" id="csv">Export CSV</button>
+    </div>
+    <div class="tblwrap"><table class="tbl"><thead><tr><th>Player</th><th>Status</th><th class="r">Level</th><th class="r">Cash</th><th class="r">Trips</th><th class="r">Fleet</th><th>Licence</th><th class="r">Flags</th><th>Last seen</th><th></th></tr></thead>
+    <tbody>${res.rows.map(p => `<tr data-p="${esc(p.id)}">
+      <td><div style="display:flex;gap:10px;align-items:center">${avatar(p)}<div class="who"><b>${esc(p.name || '—')}</b><small>${esc(p.email)}</small></div></div></td>
+      <td>${statusPills(p)}</td>
+      <td class="r num">${fmt(p.level)}</td><td class="r num">${fmt(p.cash)}</td><td class="r num">${fmt(p.total_trips)}</td><td class="r num">${fmt(p.vehicles)}</td>
+      <td>${licPill(p)}</td>
+      <td class="r">${p.open_flags ? `<span class="pill bad">${p.open_flags}</span>` : '<span style="color:var(--dim)">0</span>'}</td>
+      <td style="color:var(--mut)">${ago(p.last_seen)}</td>
+      <td class="r">${p.is_dev ? '' : isBanned(p) ? `<button class="btn sm good" data-q="unban" data-id="${esc(p.id)}">Unban</button>` : `<button class="btn sm danger" data-q="ban" data-id="${esc(p.id)}">Ban</button>`}</td>
+    </tr>`).join('') || `<tr><td colspan="10"><div class="empty">No players match${f.search ? ` “${esc(f.search)}”` : ''}.</div></td></tr>`}</tbody></table></div>
+    <div class="pager"><span>${res.total ? `${fmt(f.offset + 1)}–${fmt(Math.min(res.total, f.offset + f.limit))} of ${fmt(res.total)}` : ''}</span>
+      <button class="btn sm" data-page="-1" ${f.offset ? '' : 'disabled'}>Previous</button><button class="btn sm" data-page="1" ${f.offset + f.limit < res.total ? '' : 'disabled'}>Next</button></div>`;
+  },
+
+  async flags(){
+    const open = ST.flagOpen !== false, list = await API.rpc('admin_flags', {p_open_only:open, p_limit:300});
+    return `<div class="bar"><div class="chips"><button class="chip ${open ? 'on' : ''}" data-fl="1">Open</button><button class="chip ${open ? '' : 'on'}" data-fl="0">All</button></div></div>
+    <div class="card">${list.length ? list.map(f => `<div class="flag">
+      <div class="sev s${Math.min(3, f.severity || 1)}" title="Severity">${f.severity || 1}</div>
+      <div style="min-width:0"><b style="text-transform:capitalize">${esc(f.kind.replace(/_/g, ' '))}</b> ${f.reviewed ? '<span class="pill mut">Reviewed</span>' : '<span class="pill warn">Open</span>'} ${f.is_dev ? '<span class="pill dev">DEV</span>' : ''} ${isBanned(f) ? '<span class="pill bad">Banned</span>' : ''}
+        <div style="color:var(--mut);font-size:12.5px"><a href="#" data-p="${esc(f.player_id)}">${esc(f.name || f.email || f.player_id)}</a> · ${dt(f.created_at)}</div>
+        ${f.detail ? `<pre>${esc(JSON.stringify(f.detail, null, 2))}</pre>` : ''}</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end">
+        ${f.reviewed ? `<button class="btn sm" data-rf="${f.id}" data-v="0">Reopen</button>` : `<button class="btn sm good" data-rf="${f.id}" data-v="1">Mark reviewed</button>`}
+        ${!f.is_dev && !isBanned(f) ? `<button class="btn sm danger" data-q="ban" data-id="${esc(f.player_id)}">Ban</button>` : ''}
+      </div></div>`).join('') : `<div class="empty">${open ? 'No open flags. Nothing needs your attention.' : 'No flags have ever been raised.'}</div>`}</div>`;
+  },
+
+  async trips(){
+    const bad = !!ST.tripBad, list = await API.rpc('admin_trips', {p_player:null, p_rejected_only:bad, p_limit:300});
+    return `<div class="bar"><div class="chips"><button class="chip ${bad ? '' : 'on'}" data-tb="0">All trips</button><button class="chip ${bad ? 'on' : ''}" data-tb="1">Rejected only</button></div></div>${tripTable(list, true)}`;
+  },
+
+  async devs(){
+    const res = await API.rpc('admin_players', {p_search:'', p_filter:'dev', p_sort:'new', p_limit:200, p_offset:0});
+    return `<div class="split">
+      <div class="card"><h3>Create a dev account</h3>
+        <p style="color:var(--mut);margin:-4px 0 14px;font-size:13px">A new sign-in with <b class="num" style="color:var(--amber2)">EGP 9,999,999</b>, level 30, a pro licence to 2099 and all ${VEHICLES.length} vehicles. The balance refills itself and the anti-cheat cannot ban it.</p>
+        <label class="field"><span>Email</span><input class="in" id="dEmail" type="email" placeholder="tester1@ogra.app"></label>
+        <label class="field"><span>Password</span><div style="display:flex;gap:6px"><input class="in num" id="dPass" type="text" autocomplete="off"><button class="btn" id="dGen" type="button">Generate</button></div></label>
+        <label class="field"><span>Display name</span><input class="in" id="dName" placeholder="QA — Tester 1"></label>
+        <label class="field"><span>Note (why this account exists)</span><input class="in" id="dNote" placeholder="Balancing the coach routes"></label>
+        <button class="btn devb wide" id="dCreate">Create dev account</button>
+        <div class="hint">Needs the <code>admin-account</code> edge function. To upgrade an existing player instead, open them and choose <b>Make dev</b>.</div>
+      </div>
+      <div class="card"><h3>Dev accounts <small>${fmt(res.total)}</small></h3>
+        ${res.rows.length ? `<ul class="mini">${res.rows.map(p => `<li data-p="${esc(p.id)}">${avatar(p)}<div class="who"><b>${esc(p.name || p.email)}</b><small>${esc(p.email)}${p.dev_note ? ' · ' + esc(p.dev_note) : ''}</small></div><span class="num" style="color:var(--amber2)">${short(p.cash)}</span><span class="pill mut">${fmt(p.vehicles)} vehicles</span><button class="btn sm" data-rmdev="${esc(p.id)}">Remove dev</button></li>`).join('')}</ul>` : '<div class="empty">No dev accounts yet.</div>'}
+      </div></div>`;
+  },
+
+  async admins(){
+    const list = await API.rpc('admin_list_admins');
+    return `<div class="split">
+      <div class="card"><h3>Add an admin</h3><p style="color:var(--mut);margin:-4px 0 14px;font-size:13px">They must already have signed up to the game with this email.</p>
+        <label class="field"><span>Email</span><input class="in" id="aEmail" type="email"></label><button class="btn pri wide" id="aAdd">Grant admin access</button></div>
+      <div class="card"><h3>Admins <small>${list.length}</small></h3><ul class="mini">${list.map(a => `<li style="cursor:default"><div class="av" style="background:hsl(${hue(a.user_id)},70%,70%)">${esc(a.email[0].toUpperCase())}</div><div class="who"><b>${esc(a.email)}</b><small>Added ${ago(a.added_at)}${a.added_by ? ' by ' + esc(a.added_by) : ''}</small></div><button class="btn sm danger" data-rmadmin="${esc(a.user_id)}" data-email="${esc(a.email)}">Revoke</button></li>`).join('')}</ul></div></div>`;
+  },
+
+  async audit(){
+    const list = await API.rpc('admin_audit_log', {p_limit:400});
+    return auditTable(list, true);
+  }
+};
+
+function statusPills(p){ const o = [];
+  if (p.is_dev) o.push('<span class="pill dev">DEV</span>');
+  if (isBanned(p)) o.push(`<span class="pill bad" title="${esc(p.ban_reason || '')}">Banned · ${until(p.banned_until)}</span>`);
+  if (isOnline(p)) o.push('<span class="pill ok">Online</span>');
+  if (!o.length) o.push('<span class="pill mut">Offline</span>');
+  return o.join(' '); }
+function licPill(p){ const c = p.licence_class || 'none'; if (c === 'none') return '<span class="pill mut">None</span>';
+  const exp = p.licence_exp && new Date(p.licence_exp) < new Date(); return `<span class="pill ${exp ? 'warn' : 'amb'}">${c === 'pro' ? 'Pro' : 'Private'}${exp ? ' · expired' : ''}</span>`; }
+function tripTable(list, withPlayer){
+  if (!list.length) return '<div class="card"><div class="empty">No trips recorded.</div></div>';
+  return `<div class="tblwrap"><table class="tbl"><thead><tr>${withPlayer ? '<th>Player</th>' : ''}<th>Route</th><th>Vehicle</th><th class="r">Time</th><th class="r">Pax</th><th class="r">km</th><th class="r">Fare</th><th class="r">Fines</th><th class="r">Net</th><th class="r">XP</th><th>Result</th><th>Ended</th></tr></thead><tbody>
+  ${list.map(t => `<tr ${withPlayer ? `data-p="${esc(t.player_id)}"` : 'style="cursor:default"'}>${withPlayer ? `<td><div class="who"><b>${esc(t.name || t.email || t.player_id)}</b></div></td>` : ''}
+    <td>${esc(ROUTE_NAMES[t.route_id] || t.route_id)}</td><td style="color:var(--mut)">${esc(VNAME[t.vehicle_id] || t.vehicle_id || '—')}</td>
+    <td class="r num">${Math.floor(t.duration_s/60)}:${String(t.duration_s % 60).padStart(2, '0')}</td><td class="r num">${fmt(t.passengers)}</td><td class="r num">${Number(t.distance_km || 0).toFixed(1)}</td>
+    <td class="r num">${fmt(t.fare_earned)}</td><td class="r num" style="color:${t.fines ? '#ff9aa4' : 'inherit'}">${fmt(t.fines)}</td><td class="r num" style="color:${t.net < 0 ? '#ff9aa4' : 'var(--amber2)'}">${fmt(t.net)}</td><td class="r num">${fmt(t.xp_gained)}</td>
+    <td>${t.accepted ? '<span class="pill ok">Accepted</span>' : `<span class="pill bad" title="${esc(t.reject_note || '')}">Rejected</span>`}${!t.accepted && t.reject_note ? `<div style="color:var(--dim);font-size:11.5px;max-width:220px;white-space:normal">${esc(t.reject_note)}</div>` : ''}</td>
+    <td style="color:var(--mut)">${dt(t.ended_at)}</td></tr>`).join('')}</tbody></table></div>`;
+}
+const ACTION_LABEL = {edit_player:'Edited profile',ban:'Banned',unban:'Unbanned',grant_vehicle:'Gave vehicle',remove_vehicle:'Removed vehicle',set_current_vehicle:'Set current vehicle',repair_refuel:'Repaired and refuelled',make_dev:'Made dev account',remove_dev:'Removed dev status',reset_progress:'Reset progress',edit_save:'Edited save data',flag_reviewed:'Reviewed flag',flag_reopened:'Reopened flag',flags_cleared:'Cleared all flags',delete_player:'Deleted player data',grant_admin:'Granted admin',revoke_admin:'Revoked admin',create_dev_account:'Created dev account',set_password:'Set a new password',delete_account:'Deleted sign-in account'};
+function auditTable(list, withTarget){
+  if (!list.length) return '<div class="card"><div class="empty">No admin actions yet.</div></div>';
+  return `<div class="tblwrap"><table class="tbl"><thead><tr><th>When</th><th>Admin</th><th>Action</th>${withTarget ? '<th>Target</th>' : ''}<th>Detail</th></tr></thead><tbody>
+  ${list.map(a => `<tr ${withTarget && a.target ? `data-p="${esc(a.target)}"` : 'style="cursor:default"'}><td style="color:var(--mut)">${dt(a.at)}</td><td>${esc(a.admin_email || '—')}</td><td><b>${esc(ACTION_LABEL[a.action] || a.action)}</b></td>${withTarget ? `<td style="color:var(--mut);font:12px ui-monospace,monospace">${esc((a.target || '').slice(0, 8))}</td>` : ''}<td style="white-space:normal;color:var(--mut);font-size:12.5px;max-width:420px">${a.detail ? esc(auditDetail(a)) : ''}</td></tr>`).join('')}</tbody></table></div>`;
+}
+function auditDetail(a){ const d = a.detail || {};
+  if (a.action === 'ban') return (d.hours == null ? 'Permanent' : d.hours + ' h') + ' — ' + (d.reason || '');
+  if (a.action === 'edit_player' && d.patch) return Object.keys(d.patch).map(k => `${k}: ${d.before && d.before[k] != null ? d.before[k] : '—'} → ${d.patch[k]}`).join(' · ');
+  if (d.vehicle) return VNAME[d.vehicle] || d.vehicle;
+  return JSON.stringify(d); }
+
+/* ================= DELEGATED CLICKS ================= */
+document.addEventListener('click', async e => {
+  const t = e.target;
+  const pRow = t.closest('[data-p]'); const q = t.closest('[data-q]');
+  if (q) { e.stopPropagation(); const id = q.dataset.id; if (q.dataset.q === 'ban') banModal(id); else doAct(() => API.rpc('admin_unban', {p_player:id}), 'Player unbanned'); return; }
+  if (t.closest('[data-go]')) return go(t.closest('[data-go]').dataset.go);
+  if (t.closest('[data-filter]')) { ST.pf.filter = t.closest('[data-filter]').dataset.filter; ST.pf.offset = 0; return render(); }
+  if (t.closest('[data-page]')) { ST.pf.offset = Math.max(0, ST.pf.offset + Number(t.closest('[data-page]').dataset.page)*ST.pf.limit); return render(); }
+  if (t.closest('[data-fl]')) { ST.flagOpen = t.closest('[data-fl]').dataset.fl === '1'; return render(); }
+  if (t.closest('[data-tb]')) { ST.tripBad = t.closest('[data-tb]').dataset.tb === '1'; return render(); }
+  if (t.closest('[data-rf]')) { const b = t.closest('[data-rf]'); return doAct(() => API.rpc('admin_review_flag', {p_id:Number(b.dataset.rf), p_reviewed:b.dataset.v === '1'}), b.dataset.v === '1' ? 'Flag marked reviewed' : 'Flag reopened'); }
+  if (t.closest('[data-rmdev]')) { e.stopPropagation(); const id = t.closest('[data-rmdev]').dataset.rmdev; return removeDevModal(id); }
+  if (t.closest('[data-rmadmin]')) { const b = t.closest('[data-rmadmin]'); return confirmModal('Revoke admin access?', `${esc(b.dataset.email)} will no longer be able to open the control room.`, 'Revoke', () => API.rpc('admin_revoke_admin', {p_user:b.dataset.rmadmin}), 'Admin access revoked'); }
+  if (t.id === 'csv') return exportCSV();
+  if (t.id === 'dGen') { $('#dPass').value = genPass(); return; }
+  if (t.id === 'dCreate') return createDev();
+  if (t.id === 'aAdd') { const em = $('#aEmail').value.trim(); if (!em) return toast('Enter an email', true); return doAct(() => API.rpc('admin_grant_admin', {p_email:em}), em + ' is now an admin'); }
+  if (pRow && !t.closest('#drawer')) { e.preventDefault(); openPlayer(pRow.dataset.p); }
+});
+document.addEventListener('change', e => { if (e.target.id === 'pSort') { ST.pf.sort = e.target.value; render(); } });
+VIEW_AFTER.players = () => { const s = $('#pSort'); if (s) s.value = ST.pf.sort; };
+VIEW_AFTER.devs = () => { const p = $('#dPass'); if (p && !p.value) p.value = genPass(); };
+
+async function doAct(fn, ok){ ST.busy = true; try { await fn(); toast(ok); closeModal(); await render(true); if ($('#drawer').classList.contains('on')) await openPlayer(ST.player.player.id, true); } catch (e) { toast(e.message, true); } finally { ST.busy = false; } }
+const genPass = () => { const a = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789'; const r = crypto.getRandomValues(new Uint32Array(14)); return 'ogra-' + [...r].map(x => a[x % a.length]).join(''); };
+async function createDev(){
+  const email = $('#dEmail').value.trim(), password = $('#dPass').value, name = $('#dName').value.trim(), note = $('#dNote').value.trim();
+  if (!email || password.length < 12 || password.length > 128) return toast('Enter an email and a password of 12–128 characters', true);
+  const b = $('#dCreate'); b.disabled = true; b.textContent = 'Creating…';
+  try { await API.account({action:'create_dev', email, password, name, note});
+    modal(`<h3>Dev account ready</h3><p>Share these with the tester. The password is shown only once.</p>
+      <div class="card" style="background:#0a1120"><div class="field"><span>Email</span><b>${esc(email)}</b></div><div class="field" style="margin:0"><span>Password</span><b class="num" style="font-size:18px;color:var(--amber2)">${esc(password)}</b></div></div>
+      <div class="foot"><button class="btn" id="cpy">Copy both</button><button class="btn pri" data-close>Done</button></div>`);
+    $('#cpy').onclick = () => { navigator.clipboard.writeText(`Email: ${email}\nPassword: ${password}`); toast('Copied'); };
+    render(true);
+  } catch (e) { toast(e.message, true); } finally { b.disabled = false; b.textContent = 'Create dev account'; }
+}
+function exportCSV(){
+  const rows = ST.lastPlayers || [], cols = ['id','email','name','level','xp','cash','total_trips','total_pax','total_km','total_fines','licence_class','licence_exp','is_dev','banned_until','ban_reason','open_flags','created_at','last_seen'];
+  const csv = [cols.join(','), ...rows.map(r => cols.map(c => `"${String(r[c] ?? '').replace(/"/g, '""')}"`).join(','))].join('\n');
+  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], {type:'text/csv'})); a.download = `ogra-players-${new Date().toISOString().slice(0, 10)}.csv`; a.click();
+}
+
+/* ================= PLAYER DRAWER ================= */
+async function openPlayer(id, silent){
+  const dr = $('#drawer');
+  if (!silent) { dr.innerHTML = '<div class="empty" style="margin-top:40vh">Loading player…</div>'; dr.classList.add('on'); $('#scrim').classList.add('on'); }
+  try { ST.player = await API.rpc('admin_player', {p_player:id}); if (!ST.player.player) { toast('That player no longer exists', true); return closeDrawer(); } drawPlayer(); }
+  catch (e) { toast(e.message, true); if (!silent) closeDrawer(); }
+}
+function closeDrawer(){ $('#drawer').classList.remove('on'); $('#scrim').classList.remove('on'); }
+const PFIELDS = [['name','Display name','text'],['cash','Cash (EGP)','number'],['xp','XP','number'],['level','Level','number'],['reputation','Reputation (0–5)','number'],['licence_class','Licence','select'],['licence_exp','Licence expiry','date'],['licence_pts','Penalty points','number'],['total_trips','Total trips','number'],['total_pax','Total passengers','number'],['total_km','Total km','number'],['total_fines','Total fines (EGP)','number']];
+function drawPlayer(){
+  const D = ST.player, p = D.player, dr = $('#drawer'), scroll = dr.querySelector('.db') ? dr.querySelector('.db').scrollTop : 0;
+  const tabs = [['profile','Profile'],['fleet','Fleet',D.vehicles.length],['trips','Trips',D.trips.length],['flags','Flags',D.flags.filter(f => !f.reviewed).length],['save','Save data'],['history','History',D.audit.length]];
+  dr.innerHTML = `
+  <div class="dh">
+    <div class="row1">${avatar(p, true)}<div style="min-width:0"><h2>${esc(p.name || p.email)}</h2>
+      <div class="meta"><span>${esc(p.email)}</span>${D.confirmed === false ? '<span class="pill warn">Email not confirmed</span>' : ''}<button class="btn sm" id="cpId" title="Copy player ID">ID ${esc(String(p.id).slice(0, 8))}…</button></div>
+      <div class="meta" style="margin-top:6px">${statusPills(p)} <span>Joined ${dt(p.created_at)}</span><span>· Seen ${ago(p.last_seen)}</span></div></div>
+      <button class="x" id="dClose" aria-label="Close">✕</button></div>
+    ${isBanned(p) ? `<div class="banbox"><div style="flex:1"><b>Banned · ${until(p.banned_until)}${new Date(p.banned_until).getFullYear() > 9000 ? '' : ' left'}</b><div style="color:var(--mut);font-size:12.5px">${esc(p.ban_reason || 'No reason given')} · until ${new Date(p.banned_until).getFullYear() > 9000 ? 'lifted by an admin' : dt(p.banned_until)}</div></div><button class="btn sm good" data-a="unban">Lift ban</button></div>` : ''}
+    ${p.is_dev ? `<div class="devbox"><b>Dev account.</b> Balance refills to 9,999,999, every vehicle is owned, and bans and flags are ignored.${p.dev_note ? ' Note: ' + esc(p.dev_note) : ''}</div>` : ''}
+    <div class="stats">
+      <div class="stat"><span>Cash</span><b class="num" style="color:var(--amber2)">${short(p.cash)}</b></div>
+      <div class="stat"><span>Level · XP</span><b class="num">${fmt(p.level)} <small style="color:var(--dim);font-size:13px">${short(p.xp)}</small></b></div>
+      <div class="stat"><span>Trips</span><b class="num">${fmt(p.total_trips)}</b></div>
+      <div class="stat"><span>Fines paid</span><b class="num">${short(p.total_fines)}</b></div>
+      <div class="stat"><span>Rating</span><b class="num">${Number(p.reputation ?? 0).toFixed(2)}</b></div>
+    </div>
+    <div class="actions">
+      ${p.is_dev ? '' : isBanned(p) ? '<button class="btn good" data-a="unban">Unban</button>' : '<button class="btn danger" data-a="ban">Ban…</button>'}
+      ${p.is_dev ? '<button class="btn devb" data-a="undev">Remove dev</button>' : '<button class="btn devb" data-a="dev">Make dev</button>'}
+      <button class="btn" data-a="cash">Adjust cash…</button>
+      <button class="btn" data-a="repair">Repair & refuel fleet</button>
+      <button class="btn" data-a="password">Set password…</button>
+      <button class="btn" data-a="reset" ${p.is_dev ? 'disabled' : ''}>Reset progress…</button>
+      <button class="btn danger" data-a="delete">Delete…</button>
+    </div>
+    <div class="tabs">${tabs.map(([k, n, c]) => `<button data-t="${k}" class="${ST.ptab === k ? 'on' : ''}">${n}${c ? `<b>${c}</b>` : ''}</button>`).join('')}</div>
+  </div>
+  <div class="db">${TAB[ST.ptab](D)}</div>`;
+  dr.querySelector('.db').scrollTop = scroll;
+  $('#dClose').onclick = closeDrawer;
+  $('#cpId').onclick = () => { navigator.clipboard.writeText(p.id); toast('Player ID copied'); };
+  dr.querySelector('.tabs').onclick = e => { const b = e.target.closest('[data-t]'); if (b) { ST.ptab = b.dataset.t; drawPlayer(); } };
+  dr.onclick = drawerClick;
+  if (ST.ptab === 'profile') bindProfile(p);
+}
+const TAB = {
+  profile: D => { const p = D.player; return `<div class="form">
+    ${PFIELDS.map(([k, n, type]) => `<label class="field" data-k="${k}"><span>${n}</span>${type === 'select'
+      ? `<select class="in" name="${k}">${['none','private','pro'].map(o => `<option ${p[k] === o ? 'selected' : ''} value="${o}">${o === 'none' ? 'No licence' : o === 'pro' ? 'Professional' : 'Private'}</option>`).join('')}</select>`
+      : `<input class="in ${type === 'number' ? 'num' : ''}" name="${k}" type="${type}" value="${esc(type === 'date' ? (p[k] || '').slice(0, 10) : p[k] ?? '')}" ${type === 'number' ? 'step="any"' : ''}>`}</label>`).join('')}
+    <label class="field span3" data-k="admin_note"><span>Private admin note</span><textarea class="in" name="admin_note" rows="3" placeholder="Only admins see this">${esc(p.admin_note || '')}</textarea></label>
+  </div>
+  <div class="sticky"><span id="chg" style="color:var(--mut)">No changes</span><div class="sp"></div><button class="btn" id="pRevert" disabled>Discard</button><button class="btn pri" id="pSave" disabled>Save changes</button></div>
+  ${p.is_dev ? '<div class="hint">Dev accounts keep at least 9,999,999 cash, level 30 and a pro licence — lower values are raised back automatically.</div>' : ''}`; },
+  fleet: D => { const owned = Object.fromEntries(D.vehicles.map(v => [v.vehicle_id, v]));
+    const groups = [['micro','Microbuses'],['minibus','Minibuses'],['bus','Buses & coaches'],['car','Cars (Ogra Go)']];
+    return `<div class="bar"><span style="color:var(--mut)">${D.vehicles.length} of ${VEHICLES.length} owned</span><div style="flex:1"></div><button class="btn sm" data-a="grantall">Give every vehicle</button></div>
+    ${groups.map(([cat, n]) => `<h4 style="margin:18px 0 10px;color:var(--mut);font-size:13px">${n}</h4><div class="vgrid">${VEHICLES.filter(v => v[2] === cat).map(v => { const o = owned[v[0]];
+      return `<div class="veh ${o ? 'own' : ''} ${o && o.is_current ? 'cur' : ''}"><div class="h"><div><b>${esc(v[1])}</b><small>${v[3]} seats · unlocks at level ${v[4]}</small></div>${o && o.is_current ? '<span class="pill amb">Current</span>' : o ? '<span class="pill ok">Owned</span>' : ''}</div>
+      ${o ? `<small style="color:var(--dim)">Fuel ${Number(o.fuel).toFixed(0)} L · bought ${ago(o.bought_at)}</small>` : ''}
+      <div class="f">${o ? `${o.is_current ? '' : `<button class="btn sm" data-a="current" data-v="${v[0]}">Set current</button>`}<button class="btn sm danger" data-a="rmveh" data-v="${v[0]}">Remove</button>` : `<button class="btn sm good" data-a="give" data-v="${v[0]}">Give</button>`}</div></div>`; }).join('')}</div>`).join('')}`; },
+  trips: D => tripTable(D.trips, false),
+  flags: D => `<div class="bar"><div style="flex:1"></div>${D.flags.some(f => !f.reviewed) ? '<button class="btn sm good" data-a="clearflags">Mark all reviewed</button>' : ''}</div>
+    <div class="card">${D.flags.length ? D.flags.map(f => `<div class="flag"><div class="sev s${Math.min(3, f.severity || 1)}">${f.severity || 1}</div><div style="min-width:0"><b style="text-transform:capitalize">${esc(f.kind.replace(/_/g, ' '))}</b> ${f.reviewed ? '<span class="pill mut">Reviewed</span>' : '<span class="pill warn">Open</span>'}<div style="color:var(--mut);font-size:12.5px">${dt(f.created_at)}</div>${f.detail ? `<pre>${esc(JSON.stringify(f.detail, null, 2))}</pre>` : ''}</div><div>${f.reviewed ? `<button class="btn sm" data-rf="${f.id}" data-v="0">Reopen</button>` : `<button class="btn sm good" data-rf="${f.id}" data-v="1">Reviewed</button>`}</div></div>`).join('') : '<div class="empty">This player has never been flagged.</div>'}</div>`,
+  save: D => `<p style="color:var(--mut);margin:0 0 10px">Settings, avatar and name synced from the device. Money, level and vehicles are not stored here.</p>
+    <textarea class="in" id="saveJson" rows="22" spellcheck="false">${esc(JSON.stringify(D.save || {}, null, 2))}</textarea>
+    <div class="sticky"><span id="saveMsg" style="color:var(--mut)">Valid JSON</span><div class="sp"></div><button class="btn pri" data-a="savejson">Save data</button></div>`,
+  history: D => auditTable(D.audit, false)
+};
+function bindProfile(p){
+  const dr = $('#drawer'), save = $('#pSave'), rev = $('#pRevert');
+  const read = () => { const patch = {}; dr.querySelectorAll('.form [name]').forEach(el => { const k = el.name, f = PFIELDS.find(x => x[0] === k), type = f ? f[2] : 'text';
+      let v = el.value, orig = p[k]; if (type === 'date') orig = (orig || '').slice(0, 10); if (orig == null) orig = '';
+      const same = type === 'number' ? Number(v) === Number(orig) && v !== '' : String(v) === String(orig);
+      el.closest('.field').classList.toggle('changed', !same); if (!same) patch[k] = type === 'number' ? Number(v) : v; }); return patch; };
+  const upd = () => { const n = Object.keys(read()).length; save.disabled = rev.disabled = !n; $('#chg').textContent = n ? `${n} unsaved change${n > 1 ? 's' : ''}` : 'No changes'; $('#chg').style.color = n ? 'var(--amber2)' : 'var(--mut)'; };
+  dr.querySelector('.form').oninput = upd; dr.querySelector('.form').onchange = upd;
+  rev.onclick = () => drawPlayer();
+  save.onclick = () => { const patch = read(); for (const k of ['cash','xp','level','licence_pts','total_trips','total_pax','total_fines']) if (k in patch && (!Number.isFinite(patch[k]) || patch[k] < 0)) return toast(k.replace('_', ' ') + ' must be a positive number', true);
+    doAct(() => API.rpc('admin_update_player', {p_player:p.id, p_patch:patch}), 'Profile saved'); };
+}
+async function drawerClick(e){
+  const b = e.target.closest('[data-a]'); if (!b) return; const p = ST.player.player, id = p.id, a = b.dataset.a;
+  if (a === 'ban') return banModal(id, p);
+  if (a === 'unban') return doAct(() => API.rpc('admin_unban', {p_player:id}), 'Ban lifted');
+  if (a === 'dev') return confirmModal('Make this a dev account?', `<b>${esc(p.email)}</b> gets EGP 9,999,999, level 30, a pro licence to 2099 and all ${VEHICLES.length} vehicles. Open flags are closed and any ban is lifted.`, 'Make dev', () => API.rpc('admin_make_dev', {p_player:id, p_note:null}), 'Dev account enabled', 'devb');
+  if (a === 'undev') return removeDevModal(id);
+  if (a === 'cash') return cashModal(p);
+  if (a === 'repair') return doAct(() => API.rpc('admin_repair_vehicles', {p_player:id}), 'Fleet repaired and refuelled');
+  if (a === 'password') return passwordModal(p);
+  if (a === 'reset') return confirmModal('Reset all progress?', `Cash back to 7,000, level 1, no licence, statistics cleared and only the starter van left. Trips and flags stay for the record.`, 'Reset progress', () => API.rpc('admin_reset_player', {p_player:id}), 'Progress reset', 'danger', p.email);
+  if (a === 'delete') return deleteModal(p);
+  if (a === 'give') return doAct(() => API.rpc('admin_grant_vehicle', {p_player:id, p_vehicle:b.dataset.v, p_fuel:60}), VNAME[b.dataset.v] + ' given');
+  if (a === 'rmveh') return doAct(() => API.rpc('admin_remove_vehicle', {p_player:id, p_vehicle:b.dataset.v}), VNAME[b.dataset.v] + ' removed');
+  if (a === 'current') return doAct(() => API.rpc('admin_set_current_vehicle', {p_player:id, p_vehicle:b.dataset.v}), 'Current vehicle changed');
+  if (a === 'grantall') return doAct(async () => { const own = new Set(ST.player.vehicles.map(v => v.vehicle_id)); for (const v of VEHICLES) if (!own.has(v[0])) await API.rpc('admin_grant_vehicle', {p_player:id, p_vehicle:v[0], p_fuel:60}); }, 'Every vehicle given');
+  if (a === 'clearflags') return doAct(() => API.rpc('admin_review_all_flags', {p_player:id}), 'All flags reviewed');
+  if (a === 'savejson') { let data; try { data = JSON.parse($('#saveJson').value); } catch (err) { $('#saveMsg').textContent = 'Invalid JSON: ' + err.message; $('#saveMsg').style.color = '#ff9aa4'; return; }
+    return doAct(() => API.rpc('admin_update_save', {p_player:id, p_data:data}), 'Save data updated'); }
+}
+
+/* ================= MODALS ================= */
+function modal(html){ const m = $('#modal'); m.innerHTML = `<div class="mbox" role="dialog" aria-modal="true">${html}</div>`; m.classList.remove('hidden');
+  m.onclick = e => { if (e.target === m || e.target.closest('[data-close]')) closeModal(); }; const f = m.querySelector('input,select,textarea,button.pri'); if (f) setTimeout(() => f.focus(), 30); }
+function closeModal(){ $('#modal').classList.add('hidden'); $('#modal').innerHTML = ''; }
+function confirmModal(title, body, label, fn, ok, kind, typeToConfirm){
+  modal(`<h3>${title}</h3><p>${body}</p>${typeToConfirm ? `<label class="field"><span>Type <b>${esc(typeToConfirm)}</b> to confirm</span><input class="in" id="ttc" autocomplete="off"></label>` : ''}
+    <div class="foot"><button class="btn" data-close>Cancel</button><button class="btn ${kind || 'danger'}" id="mOk" ${typeToConfirm ? 'disabled' : ''}>${label}</button></div>`);
+  if (typeToConfirm) $('#ttc').oninput = e => { $('#mOk').disabled = e.target.value.trim().toLowerCase() !== typeToConfirm.toLowerCase(); };
+  $('#mOk').onclick = () => doAct(fn, ok);
+}
+function banModal(id, p){
+  const presets = [['1','1 hour'],['24','24 hours'],['168','7 days'],['720','30 days'],['','Permanent'],['custom','Custom']];
+  const reasons = ['Cheating — edited save data','Impossible trip times','Exploiting a bug','Abusive behaviour','Multiple accounts'];
+  let hours = '24';
+  modal(`<h3>Ban ${esc(p ? (p.name || p.email) : 'player')}</h3><p>They are thrown out of the game on their next server check (within 30 seconds) and cannot sign back in until the ban ends.</p>
+    <div class="opts">${presets.map(([h, n]) => `<button class="opt ${h === hours ? 'on' : ''}" data-h="${h}">${n}</button>`).join('')}</div>
+    <label class="field hidden" id="custWrap"><span>Hours</span><input class="in num" id="custH" type="number" min="0.1" step="0.5" value="48"></label>
+    <label class="field"><span>Reason — the player sees this</span><input class="in" id="banR" list="banReasons" value="${esc(reasons[0])}"><datalist id="banReasons">${reasons.map(r => `<option value="${esc(r)}">`).join('')}</datalist></label>
+    <div class="foot"><button class="btn" data-close>Cancel</button><button class="btn danger" id="banGo">Ban player</button></div>`);
+  $('#modal .opts').onclick = e => { const b = e.target.closest('[data-h]'); if (!b) return; hours = b.dataset.h; document.querySelectorAll('#modal .opt').forEach(o => o.classList.toggle('on', o === b)); $('#custWrap').classList.toggle('hidden', hours !== 'custom'); };
+  $('#banGo').onclick = () => { const h = hours === 'custom' ? Number($('#custH').value) : hours === '' ? null : Number(hours);
+    if (hours === 'custom' && !(h > 0)) return toast('Enter the number of hours', true);
+    doAct(() => API.rpc('admin_ban', {p_player:id, p_hours:h, p_reason:$('#banR').value.trim()}), h == null ? 'Player banned permanently' : `Player banned for ${h} h`); };
+}
+function removeDevModal(id){
+  modal(`<h3>Remove dev status</h3><p>The account becomes an ordinary player again and can be flagged and banned.</p>
+    <label style="display:flex;gap:10px;align-items:center;margin:4px 0"><input type="checkbox" id="rdReset" checked> <span>Also reset to a new player (7,000 cash, level 1, starter van only)</span></label>
+    <div class="foot"><button class="btn" data-close>Cancel</button><button class="btn devb" id="rdGo">Remove dev</button></div>`);
+  $('#rdGo').onclick = () => doAct(() => API.rpc('admin_remove_dev', {p_player:id, p_reset:$('#rdReset').checked}), 'Dev status removed');
+}
+function cashModal(p){
+  modal(`<h3>Adjust cash</h3><p>Current balance <b class="num" style="color:var(--amber2)">${egp(p.cash)}</b></p>
+    <div class="opts" id="cOps">${['+1000','+10000','+100000','-1000','-10000','Set to 0'].map(v => `<button class="opt" data-c="${v}">${v}</button>`).join('')}</div>
+    <label class="field"><span>New balance</span><input class="in num" id="cVal" type="number" min="0" value="${p.cash}"></label>
+    <div class="foot"><button class="btn" data-close>Cancel</button><button class="btn pri" id="cGo">Save balance</button></div>`);
+  $('#cOps').onclick = e => { const b = e.target.closest('[data-c]'); if (!b) return; const v = b.dataset.c, cur = Number($('#cVal').value) || 0; $('#cVal').value = v === 'Set to 0' ? 0 : Math.max(0, cur + Number(v)); };
+  $('#cGo').onclick = () => { const v = Number($('#cVal').value); if (!(v >= 0)) return toast('Balance must be zero or more', true); doAct(() => API.rpc('admin_update_player', {p_player:p.id, p_patch:{cash:v}}), 'Balance set to ' + egp(v)); };
+}
+function passwordModal(p){
+  modal(`<h3>Set a new password</h3><p>For ${esc(p.email)}. They will need it the next time they sign in.</p>
+    <label class="field"><span>New password</span><div style="display:flex;gap:6px"><input class="in num" id="npw" value="${genPass()}"><button class="btn" id="npg" type="button">Generate</button></div></label>
+    <div class="foot"><button class="btn" data-close>Cancel</button><button class="btn pri" id="npGo">Set password</button></div>`);
+  $('#npg').onclick = () => { $('#npw').value = genPass(); };
+  $('#npGo').onclick = () => { const pw = $('#npw').value; if (pw.length < 12 || pw.length > 128) return toast('Use 12–128 characters', true); navigator.clipboard && navigator.clipboard.writeText(pw).catch(() => {});
+    doAct(() => API.account({action:'set_password', id:p.id, password:pw}), 'Password set and copied'); };
+}
+function deleteModal(p){
+  modal(`<h3>Delete this player</h3><p>Removes their profile, fleet, trips, flags and save data. This cannot be undone.</p>
+    <label style="display:flex;gap:10px;align-items:center;margin:0 0 12px"><input type="checkbox" id="delAuth"> <span>Also delete the sign-in account, so the email can register again</span></label>
+    <label class="field"><span>Type <b>${esc(p.email)}</b> to confirm</span><input class="in" id="ttc" autocomplete="off"></label>
+    <div class="foot"><button class="btn" data-close>Cancel</button><button class="btn danger" id="delGo" disabled>Delete permanently</button></div>`);
+  $('#ttc').oninput = e => { $('#delGo').disabled = e.target.value.trim().toLowerCase() !== p.email.toLowerCase(); };
+  $('#delGo').onclick = () => doAct(async () => { if ($('#delAuth').checked) await API.account({action:'delete_account', id:p.id}); else await API.rpc('admin_delete_player', {p_player:p.id}); closeDrawer(); }, 'Player deleted');
+}
+
+/* ================= LOGIN ART ================= */
+function drawSkyline(){
+  const cv = $('#skyline'); if (!cv || !cv.offsetWidth) return; const d = devicePixelRatio || 1, W = cv.offsetWidth, H = cv.offsetHeight; cv.width = W*d; cv.height = H*d;
+  const c = cv.getContext('2d'); c.scale(d, d);
+  const g = c.createLinearGradient(0, 0, 0, H); g.addColorStop(0, '#060a16'); g.addColorStop(.55, '#1a1d33'); g.addColorStop(.78, '#5a3a3a'); g.addColorStop(1, '#0a0d18'); c.fillStyle = g; c.fillRect(0, 0, W, H);
+  let s = 7; const R = () => (s = (s*16807) % 2147483647)/2147483647;
+  for (let i = 0; i < 90; i++) { c.fillStyle = `rgba(255,255,255,${R()*.5})`; c.fillRect(R()*W, R()*H*.45, 1, 1); }
+  const sun = c.createRadialGradient(W*.7, H*.74, 5, W*.7, H*.74, 220); sun.addColorStop(0, 'rgba(255,170,90,.55)'); sun.addColorStop(1, 'rgba(255,170,90,0)'); c.fillStyle = sun; c.fillRect(0, 0, W, H);
+  const base = H*.8;
+  for (let layer = 0; layer < 3; layer++) { let x = -20; c.fillStyle = ['#161a2c', '#10131f', '#090b14'][layer];
+    while (x < W + 40) { const w = 24 + R()*60, h = (40 + R()*150)*(1 - layer*.2) + layer*20; c.fillRect(x, base - h + layer*18, w, h + 200);
+      if (layer === 0 && R() < .12) { c.fillRect(x + w/2 - 3, base - h - 70, 6, 70); c.beginPath(); c.arc(x + w/2, base - h - 70, 5, 0, 7); c.fill(); }
+      if (layer === 2) for (let wy = base - h + layer*18 + 10; wy < base + 30; wy += 14) for (let wx = x + 5; wx < x + w - 6; wx += 11) if (R() < .22) { c.fillStyle = R() < .8 ? 'rgba(255,196,110,.75)' : 'rgba(170,210,255,.6)'; c.fillRect(wx, wy, 4, 6); c.fillStyle = '#090b14'; }
+      x += w + 2; } }
+  c.fillStyle = '#05070d'; c.fillRect(0, base + 40, W, H);
+  for (let i = 0; i < 40; i++) { c.fillStyle = `rgba(255,182,39,${.15 + R()*.3})`; c.fillRect(R()*W, base + 58 + R()*10, 26 + R()*40, 2); }
+}
+addEventListener('resize', () => { if (!$('#login').classList.contains('hidden')) drawSkyline(); });
+
+/* ================= DEMO BACKEND ================= */
+const MOCK = (() => {
+  if (!DEMO) return null;
+  let seed = 42; const R = () => (seed = (seed*16807) % 2147483647)/2147483647, pick = a => a[Math.floor(R()*a.length)];
+  const now = Date.now(), H = 3600e3, uid = () => 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, ch => Math.floor(R()*16).toString(16));
+  const first = ['Ahmed','Mahmoud','Mostafa','Omar','Youssef','Karim','Hany','Sherif','Mona','Nour','Salma','Yasmin','Ali','Tarek','Hossam','Amr','Rana','Dina','Khaled','Walid','Ibrahim','Samir','Hesham','Fady'];
+  const last = ['Hassan','Farouk','Mansour','Saeed','Adel','Nabil','Gamal','Fathy','Ashraf','Salah','Zaki','Ezzat'];
+  const P = [], V = [], T = [], F = [], S = {}, AUD = [], ADM = [{user_id:uid(), email:'demo-admin@ogra.app', added_at:new Date(now - 40*24*H).toISOString(), added_by:'bootstrap'}];
+  const routes = Object.keys(ROUTE_NAMES);
+  for (let i = 0; i < 64; i++) { const fn = pick(first), ln = pick(last), lvl = 1 + Math.floor(R()**1.8*20), id = uid();
+    const p = {id, email:`${fn}.${ln}${Math.floor(R()*90)}@gmail.com`.toLowerCase(), name:`${fn} ${ln}`, created_at:new Date(now - R()*14*24*H).toISOString(),
+      last_seen:new Date(now - (i < 9 ? R()*90e3 : R()*R()*9*24*H)).toISOString(), cash:Math.floor(2000 + R()*lvl*60000), xp:Math.floor(lvl*lvl*55 + R()*200), level:lvl, reputation:+(3.6 + R()*1.4).toFixed(2),
+      licence_class:lvl > 2 ? (R() < .8 ? 'pro' : 'private') : 'none', licence_exp:new Date(now + (R() - .2)*120*24*H).toISOString().slice(0, 10), licence_pts:Math.floor(R()*4),
+      banned_until:null, ban_reason:null, total_trips:Math.floor(lvl*8 + R()*40), total_pax:Math.floor(lvl*90 + R()*300), total_km:Math.floor(lvl*110 + R()*400), total_fines:Math.floor(R()*lvl*900), is_dev:false, dev_note:null, admin_note:null};
+    if (i === 12 || i === 30) { p.banned_until = i === 12 ? new Date(now + 5*H).toISOString() : '9999-12-31T00:00:00Z'; p.ban_reason = i === 12 ? 'Impossible trip times' : 'Cheating — edited save data'; }
+    P.push(p); S[id] = {set:{lang:R() < .7 ? 'ar' : 'en', zoom:1, manual:R() < .3}, avatar:'young-clean', name:fn};
+    const n = 1 + Math.floor(R()*Math.min(5, lvl/3 + 1)); const pool = VEHICLES.filter(v => v[4] <= lvl);
+    for (let k = 0; k < n; k++) { const v = k === 0 ? VEHICLES[0] : pick(pool); if (V.some(x => x.player_id === id && x.vehicle_id === v[0])) continue; V.push({player_id:id, vehicle_id:v[0], fuel:Math.floor(8 + R()*50), is_current:k === 0, bought_at:new Date(now - R()*10*24*H).toISOString(), condition:{}, cosmetics:{}, upgrades:{}}); } }
+  P[3].is_dev = true; P[3].name = 'QA Tester'; P[3].email = 'qa1@ogra.app'; P[3].dev_note = 'Balancing coach routes'; Object.assign(P[3], {cash:9999999, level:30, xp:999999, licence_class:'pro', licence_exp:'2099-12-31'});
+  VEHICLES.forEach(v => { if (!V.some(x => x.player_id === P[3].id && x.vehicle_id === v[0])) V.push({player_id:P[3].id, vehicle_id:v[0], fuel:60, is_current:false, bought_at:new Date().toISOString(), condition:{}}); });
+  for (let i = 0; i < 520; i++) { const p = pick(P), ok = R() > .06, r = pick(routes), dur = Math.floor(300 + R()*1800), pax = Math.floor(4 + R()*14), fare = pax*Math.floor(6 + R()*30), fines = R() < .2 ? Math.floor(150 + R()*800) : 0;
+    T.push({id:i + 1, player_id:p.id, route_id:r, vehicle_id:'micro_classic', started_at:null, ended_at:new Date(now - R()**1.3*26*H).toISOString(), duration_s:ok ? dur : Math.floor(20 + R()*40), passengers:pax, distance_km:+(5 + R()*40).toFixed(1), fare_earned:fare, tips:Math.floor(R()*40), fines, fuel_cost:Math.floor(R()*80), net:ok ? fare - fines : 0, xp_gained:ok ? Math.floor(20 + R()*90) : 0, accepted:ok, reject_note:ok ? null : pick(['faster than 18 s/km','payout above maximum','vehicle not owned'])}); }
+  const kinds = [['impossible_speed', 3], ['balance_jump', 2], ['payout_too_high', 2], ['edited_save', 3], ['vehicle_not_owned', 2], ['client_sent_cash', 1]];
+  for (let i = 0; i < 22; i++) { const p = pick(P), [k, sev] = pick(kinds); F.push({id:i + 1, player_id:p.id, kind:k, severity:sev, reviewed:i > 13, created_at:new Date(now - R()*72*H).toISOString(), detail:{route:pick(routes), sec_per_km:+(4 + R()*12).toFixed(1), claimed:Math.floor(R()*200000)}}); }
+  const J = x => JSON.parse(JSON.stringify(x)), gp = id => P.find(p => p.id === id), log = (action, target, detail) => AUD.unshift({id:AUD.length + 1, at:new Date().toISOString(), admin_email:'demo-admin@ogra.app', action, target, detail});
+  const devify = p => { if (p.is_dev) Object.assign(p, {cash:Math.max(p.cash, 9999999), level:Math.max(p.level, 30), xp:Math.max(p.xp, 999999), banned_until:null, ban_reason:null, licence_class:'pro', licence_exp:'2099-12-31'}); };
+  const withCounts = p => ({...p, open_flags:F.filter(f => f.player_id === p.id && !f.reviewed).length, vehicles:V.filter(v => v.player_id === p.id).length});
+  const wait = v => new Promise(r => setTimeout(() => r(J(v)), 120));
+  return {
+    rpc(fn, a){
+      const p = a.p_player && gp(a.p_player);
+      switch (fn) {
+        case 'admin_whoami': return wait({is_admin:true, email:'demo-admin@ogra.app'});
+        case 'admin_dashboard': { const day = T.filter(t => now - new Date(t.ended_at) < 24*H);
+          const byHour = Array.from({length:24}, (_, i) => { const t0 = Math.floor(now/H)*H - (23 - i)*H; const xs = T.filter(t => { const e = +new Date(t.ended_at); return e >= t0 && e < t0 + H; }); return {t:new Date(t0).toISOString(), ok:xs.filter(x => x.accepted).length, bad:xs.filter(x => !x.accepted).length}; });
+          const days = Array.from({length:14}, (_, i) => { const d0 = new Date(); d0.setHours(0, 0, 0, 0); d0.setDate(d0.getDate() - (13 - i)); return {d:d0.toISOString().slice(0, 10), n:P.filter(p => new Date(p.created_at).toDateString() === d0.toDateString()).length}; });
+          const tr = {}; T.forEach(t => { if (t.accepted) { tr[t.route_id] = tr[t.route_id] || {route_id:t.route_id, n:0, net:0}; tr[t.route_id].n++; tr[t.route_id].net += t.net; } });
+          return wait({players:P.length, online:P.filter(isOnline).length, active_24h:P.filter(p => now - new Date(p.last_seen) < 24*H).length, new_24h:P.filter(p => now - new Date(p.created_at) < 24*H).length, banned:P.filter(isBanned).length, devs:P.filter(p => p.is_dev).length, open_flags:F.filter(f => !f.reviewed).length, trips_24h:day.length, rejected_24h:day.filter(t => !t.accepted).length, earned_24h:day.reduce((s, t) => s + t.net, 0), cash_total:P.filter(p => !p.is_dev).reduce((s, p) => s + p.cash, 0), trips_by_hour:byHour, signups_by_day:days, top_routes:Object.values(tr).sort((x, y) => y.n - x.n).slice(0, 6)}); }
+        case 'admin_players': { const s = (a.p_search || '').toLowerCase(); let xs = P.map(withCounts).filter(p => !s || p.email.includes(s) || (p.name || '').toLowerCase().includes(s) || p.id === s)
+            .filter(p => a.p_filter === 'online' ? isOnline(p) : a.p_filter === 'banned' ? isBanned(p) : a.p_filter === 'dev' ? p.is_dev : a.p_filter === 'flagged' ? p.open_flags > 0 : true);
+          const key = {cash:'cash', level:'level', trips:'total_trips', flags:'open_flags', new:'created_at'}[a.p_sort] || 'last_seen';
+          xs.sort((x, y) => (y[key] > x[key] ? 1 : y[key] < x[key] ? -1 : 0)); return wait({total:xs.length, rows:xs.slice(a.p_offset, a.p_offset + a.p_limit)}); }
+        case 'admin_player': return wait(p ? {player:p, vehicles:V.filter(v => v.player_id === p.id), trips:T.filter(t => t.player_id === p.id).sort((x, y) => new Date(y.ended_at) - new Date(x.ended_at)), flags:F.filter(f => f.player_id === p.id), save:S[p.id], audit:AUD.filter(x => x.target === p.id), confirmed:true} : {player:null});
+        case 'admin_flags': return wait(F.filter(f => !a.p_open_only || !f.reviewed).sort((x, y) => new Date(y.created_at) - new Date(x.created_at)).map(f => { const q = gp(f.player_id) || {}; return {...f, email:q.email, name:q.name, is_dev:q.is_dev, banned_until:q.banned_until}; }));
+        case 'admin_trips': return wait(T.filter(t => !a.p_rejected_only || !t.accepted).sort((x, y) => new Date(y.ended_at) - new Date(x.ended_at)).slice(0, a.p_limit).map(t => { const q = gp(t.player_id) || {}; return {...t, email:q.email, name:q.name}; }));
+        case 'admin_audit_log': return wait(AUD);
+        case 'admin_list_admins': return wait(ADM);
+        case 'admin_update_player': { const before = {}; Object.keys(a.p_patch).forEach(k => { before[k] = p[k]; p[k] = a.p_patch[k]; }); devify(p); log('edit_player', p.id, {patch:a.p_patch, before}); return wait(p); }
+        case 'admin_ban': if (p.is_dev) return Promise.reject(new Error('this is a dev account — remove dev status before banning')); p.banned_until = a.p_hours == null ? '9999-12-31T00:00:00Z' : new Date(Date.now() + a.p_hours*H).toISOString(); p.ban_reason = a.p_reason; log('ban', p.id, {hours:a.p_hours, reason:a.p_reason}); return wait(p);
+        case 'admin_unban': p.banned_until = null; p.ban_reason = null; log('unban', p.id, null); return wait(p);
+        case 'admin_grant_vehicle': if (!V.some(v => v.player_id === p.id && v.vehicle_id === a.p_vehicle)) V.push({player_id:p.id, vehicle_id:a.p_vehicle, fuel:60, is_current:false, bought_at:new Date().toISOString()}); log('grant_vehicle', p.id, {vehicle:a.p_vehicle}); return wait(null);
+        case 'admin_remove_vehicle': { const i = V.findIndex(v => v.player_id === p.id && v.vehicle_id === a.p_vehicle); if (i >= 0) V.splice(i, 1); log('remove_vehicle', p.id, {vehicle:a.p_vehicle}); return wait(null); }
+        case 'admin_set_current_vehicle': V.filter(v => v.player_id === p.id).forEach(v => v.is_current = v.vehicle_id === a.p_vehicle); log('set_current_vehicle', p.id, {vehicle:a.p_vehicle}); return wait(null);
+        case 'admin_repair_vehicles': V.filter(v => v.player_id === p.id).forEach(v => v.fuel = 60); log('repair_refuel', p.id, null); return wait(null);
+        case 'admin_make_dev': p.is_dev = true; devify(p); VEHICLES.forEach(v => { if (!V.some(x => x.player_id === p.id && x.vehicle_id === v[0])) V.push({player_id:p.id, vehicle_id:v[0], fuel:60, bought_at:new Date().toISOString()}); }); F.filter(f => f.player_id === p.id).forEach(f => f.reviewed = true); log('make_dev', p.id, null); return wait(p);
+        case 'admin_remove_dev': p.is_dev = false; if (a.p_reset) { Object.assign(p, {cash:7000, level:1, xp:0, licence_class:'none', licence_exp:null}); for (let i = V.length - 1; i >= 0; i--) if (V[i].player_id === p.id && V[i].vehicle_id !== 'v_n300') V.splice(i, 1); } log('remove_dev', p.id, {reset:a.p_reset}); return wait(p);
+        case 'admin_reset_player': Object.assign(p, {cash:7000, level:1, xp:0, licence_class:'none', licence_exp:null, total_trips:0, total_pax:0, total_km:0, total_fines:0}); for (let i = V.length - 1; i >= 0; i--) if (V[i].player_id === p.id) V.splice(i, 1); V.push({player_id:p.id, vehicle_id:'v_n300', fuel:20, is_current:true, bought_at:new Date().toISOString()}); log('reset_progress', p.id, null); return wait(p);
+        case 'admin_update_save': S[p.id] = a.p_data; log('edit_save', p.id, null); return wait(null);
+        case 'admin_review_flag': { const f = F.find(x => x.id === a.p_id); f.reviewed = a.p_reviewed; log(a.p_reviewed ? 'flag_reviewed' : 'flag_reopened', f.player_id, {flag:f.id}); return wait(null); }
+        case 'admin_review_all_flags': F.filter(f => f.player_id === p.id).forEach(f => f.reviewed = true); log('flags_cleared', p.id, null); return wait(null);
+        case 'admin_delete_player': P.splice(P.indexOf(p), 1); log('delete_player', a.p_player, {email:p.email}); return wait(null);
+        case 'admin_grant_admin': ADM.push({user_id:uid(), email:a.p_email, added_at:new Date().toISOString(), added_by:'demo-admin@ogra.app'}); log('grant_admin', null, {email:a.p_email}); return wait(null);
+        case 'admin_revoke_admin': ADM.splice(ADM.findIndex(x => x.user_id === a.p_user), 1); log('revoke_admin', a.p_user, null); return wait(null);
+      }
+      return Promise.reject(new Error('demo: ' + fn));
+    },
+    account(b){
+      if (b.action === 'create_dev') { const id = uid(); const p = {id, email:b.email, name:b.name || null, created_at:new Date().toISOString(), last_seen:new Date().toISOString(), cash:0, xp:0, level:1, reputation:5, licence_class:'none', total_trips:0, total_pax:0, total_km:0, total_fines:0, is_dev:false, dev_note:b.note};
+        P.unshift(p); S[id] = {}; return this.rpc('admin_make_dev', {p_player:id}).then(() => ({ok:true, id})); }
+      if (b.action === 'delete_account') return this.rpc('admin_delete_player', {p_player:b.id});
+      log(b.action, b.id, null); return wait({ok:true});
+    }
+  };
+})();
+
+boot();
+</script>
+</body>
+</html>

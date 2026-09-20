@@ -1,0 +1,119 @@
+/* OGRA Nightshift: GPU-friendly motion; no canvas effects required in HQ. */
+:root{--nsInk:#070d16;--nsPanel:#101b29;--nsGold:#edc079;--nsCyan:#64dce5;--nsMuted:#8d9ba9}
+.nsIcon{width:22px;height:22px;flex:none;vertical-align:middle}
+.nsFx{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:-1}
+.nsFx .nsGrid,.nsFx .nsLight{z-index:auto}
+.nsSprite{position:relative;direction:ltr;width:min(90%,480px);flex:none;z-index:2;filter:drop-shadow(0 20px 15px #000b);animation:nsFloat 6s ease-in-out infinite}
+.nsSprite img{display:block;width:100%;height:100%;object-fit:contain}
+.nsLaunchVehicle .nsSprite{width:85%;filter:drop-shadow(0 20px 14px #000)}
+.nsLaunchVehicle .nsSprite img{max-height:none;max-width:none;filter:none;animation:none}
+.nsWheel{position:absolute;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(circle,#67757e 0 11%,#aab5bb 12% 15%,transparent 16%),radial-gradient(circle,transparent 0 50%,#131719 51% 66%,#242a2e 67% 73%,#080b0e 74%),repeating-conic-gradient(#a1abb3 0 12deg,#333d46 12deg 60deg);box-shadow:inset 0 0 0 2px #020507,0 2px 3px #0009}
+.nsHub button,.nsOverlay button,.nsReport button,#nsLaunch button{touch-action:manipulation;font-family:inherit;transition:background .2s,transform .2s,border-color .2s}
+.nsHub button:focus-visible,.nsOverlay button:focus-visible,.nsReport button:focus-visible,#nsLaunch button:focus-visible{outline:2px solid var(--nsCyan);outline-offset:4px}
+.nsHub button:active,.nsOverlay button:active,.nsReport button:active{transform:translateY(2px)}
+body.commandHub #screens{inset:0!important;z-index:35!important}
+body.commandHub #topBar,body.commandHub #navRail,body.commandHub #ogMode{display:none!important}
+body.commandHub #cv{visibility:hidden}
+body.commandHub #screens .nsHub{inset:0!important;padding:30px 4vw 16px!important;position:absolute;display:flex!important;flex-direction:column;gap:0;background:var(--nsInk);color:#eaf0f4;font-size:14px;overflow-y:auto;overflow-x:hidden;touch-action:pan-y;animation:nsIn .55s ease both;isolation:isolate}
+.nsHub .nsBackdrop{position:absolute;inset:0;z-index:-3;background:linear-gradient(90deg,rgba(7,13,22,.91),rgba(7,13,22,.58) 52%,#070d16 85%),url('cairo-rain-road.webp') center/cover;opacity:.55}
+.nsGrid{position:absolute;inset:0;pointer-events:none;z-index:-2;background-image:linear-gradient(#80ccd108 1px,transparent 1px),linear-gradient(90deg,#80ccd108 1px,transparent 1px);background-size:54px 54px;mask-image:linear-gradient(transparent,#000)}
+.nsLight{position:absolute;width:55vw;height:1px;background:linear-gradient(90deg,transparent,#73dce2,transparent);opacity:.4;pointer-events:none;z-index:-1;animation:nsTrail 9s linear infinite;transform:rotate(-24deg)}
+.nsLight1{top:28%;left:-55%}.nsLight2{top:68%;left:-55%;animation-delay:-4s;background:linear-gradient(90deg,transparent,#edc079,transparent)}
+@keyframes nsTrail{to{translate:180vw -30vh}}
+@keyframes nsIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes nsFloat{50%{transform:translateY(-5px)}}
+@keyframes nsPulse{50%{opacity:.4;box-shadow:0 0 15px #64dce5}}
+@keyframes nsShine{to{transform:translateX(350%) skewX(-25deg)}}
+@keyframes nsOrbit{to{transform:rotate(360deg)}}
+.nsHeader{display:flex;align-items:center;justify-content:space-between;padding-bottom:24px;border-bottom:1px solid #b8cbd51c;gap:20px;flex-shrink:0}
+.nsBrand{font:900 italic 34px/1 system-ui,sans-serif;letter-spacing:-2px;display:flex;align-items:center;gap:14px}
+.nsBrand>span{font:800 24px Cairo,system-ui;letter-spacing:0;color:var(--nsGold)}
+.nsBrand small{font:600 9px system-ui;letter-spacing:2px;color:var(--nsMuted);border-inline-start:1px solid #ffffff25;padding-inline-start:16px}
+.nsHeaderRight{display:flex;align-items:center;gap:15px}
+.nsLive{font:600 10px system-ui,Cairo;letter-spacing:2px;color:var(--nsCyan)}
+.nsLang{border:1px solid #ffffff24!important;border-radius:5px;padding:6px 12px!important;font-size:12px}
+.nsSquare{width:36px;height:36px;display:grid;place-items:center;border:1px solid #ffffff24!important;border-radius:5px}
+.nsDashboard{display:grid;grid-template-columns:1.2fr 1fr;gap:6%;align-items:center;flex:1;min-height:0;max-width:1600px;width:100%;margin:24px auto}
+.nsHero{align-self:stretch;display:flex;flex-direction:column;justify-content:center;position:relative;min-width:0}
+.nsEyebrow{display:flex;align-items:center;gap:10px;color:var(--nsCyan);font:700 10px/1.5 system-ui,Cairo;letter-spacing:2px}
+.nsEyebrow .nsIcon{width:18px;height:18px}.nsEyebrow b{margin-inline-start:auto;font:700 11px system-ui;color:var(--nsGold)}
+.nsDot{width:6px;height:6px;border-radius:50%;background:var(--nsCyan);animation:nsPulse 2.5s infinite}
+.nsHero h1{font:900 clamp(36px,4.5vw,72px)/.99 system-ui,Cairo,sans-serif;letter-spacing:-3px;margin:19px 0 12px;max-width:700px}
+.nsHero h1 em{display:block;margin-top:13px;color:var(--nsGold);font:400 italic clamp(17px,1.8vw,25px)/1.3 Georgia,Cairo,serif;letter-spacing:0}
+.nsHub[dir=rtl] h1{font-family:Cairo,system-ui;line-height:1.25;letter-spacing:-1px}
+.nsHub[dir=rtl] .nsEyebrow{letter-spacing:0}.nsHub[dir=rtl] .nsHero h1 em{font-family:Cairo;font-style:normal}
+.nsIntro{max-width:350px;font:400 12px/1.8 system-ui,Cairo;color:var(--nsMuted);margin:8px 0 4px}
+.nsVehicle{position:relative;min-height:250px;display:flex;align-items:center;justify-content:center;isolation:isolate;flex:1;padding-bottom:50px}
+.nsVehicle>img{width:min(90%,510px);max-height:190px;object-fit:contain;filter:drop-shadow(0 24px 15px #000b);animation:nsFloat 6s ease-in-out infinite;z-index:2;transform-origin:center}
+.nsOrbit{position:absolute;inset:10% 8% 20%;border-radius:50%;border:1px solid #64dce521;transform:perspective(300px) rotateX(65deg);box-shadow:0 0 70px #64dce50b,inset 0 0 70px #64dce50b}
+.nsVehicleLines{position:absolute;width:85%;height:1px;background:linear-gradient(90deg,transparent,#edc07966,transparent);bottom:27%}
+.nsVehicleCaption{position:absolute;inset-inline-start:0;bottom:3px;display:flex;flex-direction:column;gap:3px}
+.nsVehicleCaption>span{font:600 8px system-ui,Cairo;letter-spacing:1.7px;color:var(--nsGold)}
+.nsVehicleCaption b{font-size:12px;font-weight:600}.nsVehicleCaption small{font:500 10px system-ui,Cairo;color:var(--nsMuted)}.nsVehicleCaption i{margin:0 5px}
+.nsHeroStats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:15px;margin-top:18px;border-top:1px solid #b8cbd51c;padding-top:18px}
+.nsHeroStats small,.nsReportStats small{display:block;font:600 8px/1.5 system-ui,Cairo;letter-spacing:1.5px;color:var(--nsMuted)}
+.nsHeroStats strong{display:block;font:500 clamp(23px,2.5vw,36px)/1.4 system-ui;letter-spacing:-1px}.nsHeroStats strong span{font:500 9px system-ui,Cairo;color:var(--nsMuted);margin-inline-start:6px;letter-spacing:0}
+.nsOperations{display:grid;gap:13px;min-width:0}
+.nsRouteCard{background:linear-gradient(130deg,#142231ee,#0c1624f0);border:1px solid #9dc4d334;border-radius:10px;padding:24px;position:relative;overflow:hidden;box-shadow:0 12px 32px #0004}
+.nsRouteCard:before{content:'';position:absolute;top:0;left:10%;right:10%;height:1px;background:linear-gradient(90deg,transparent,#84d9df,transparent)}
+.nsTag{margin-inline-start:auto;font:600 8px system-ui;letter-spacing:1px;padding:4px 7px;border:1px solid #edc07955;color:var(--nsGold);border-radius:3px}
+.nsRouteCard h2{font:600 clamp(20px,2vw,30px)/1.4 system-ui,Cairo;letter-spacing:-.7px;margin:16px 0 10px}
+.nsRouteMeta{display:flex;gap:14px;flex-wrap:wrap;color:var(--nsMuted);font:500 10px system-ui,Cairo}.nsRouteMeta span+span{border-inline-start:1px solid #ffffff20;padding-inline-start:14px}
+.nsTime{display:flex;gap:6px;margin:23px 0 15px}.nsTime button{display:flex;align-items:center;justify-content:center;gap:7px;font:600 10px system-ui,Cairo;flex:1;border:1px solid #ffffff14;border-radius:5px;padding:9px 6px;color:var(--nsMuted)}.nsTime .nsIcon{width:14px;height:14px}.nsTime button.on{background:#edc07914;color:var(--nsGold);border-color:#edc07977}
+.nsPrimary{display:flex;align-items:center;justify-content:space-between;gap:15px;width:100%;padding:18px 20px!important;border-radius:5px!important;background:linear-gradient(105deg,#d9a45c,#f4d59e)!important;color:#151712!important;font:800 12px system-ui,Cairo!important;letter-spacing:1px;box-shadow:0 8px 24px #edc07915;position:relative;overflow:hidden;min-height:50px;border:1px solid #ffdfae!important}
+.nsPrimary:after{content:'';position:absolute;inset:0 auto 0 -35%;width:30%;background:linear-gradient(90deg,transparent,#fff7,transparent);transform:skewX(-25deg);animation:nsShine 6s ease-in-out infinite;pointer-events:none}.nsPrimary:hover{filter:brightness(1.08)}
+.nsRouteLinks{display:flex;justify-content:space-between;margin-top:12px}.nsRouteLinks button{font:500 10px system-ui,Cairo;color:#b4c2ce;padding:5px 0}
+.nsContractCard{padding:18px 20px;background:#0d1925da;border:1px solid #9dc4d325;border-radius:8px}
+.nsContractChoices{display:flex;gap:6px;margin:13px 0 10px}.nsContractChoices button{display:flex;align-items:center;justify-content:center;gap:6px;border:1px solid #ffffff14;border-radius:5px;color:#8d9ba9;font:600 10px/1.4 system-ui,Cairo;padding:9px 5px;flex:1}.nsContractChoices .nsIcon{width:15px;height:15px}.nsContractChoices .on{background:#64dce516;color:#91e8ed;border-color:#64dce566}
+.nsContractCard p{font:400 11px/1.6 system-ui,Cairo;color:#bdc9d3;margin:8px 0}.nsContractCard>small{font:400 8px/1.5 system-ui,Cairo;color:#84939f;display:block}
+.nsSpotlight{display:flex;align-items:center;gap:14px;padding:13px 17px;border:1px solid #edc07930;border-radius:7px;background:linear-gradient(90deg,#edc07909,transparent)}.nsSpotlight>.nsIcon{color:var(--nsGold)}.nsSpotlight>div{flex:1}.nsSpotlight small{font:600 8px system-ui,Cairo;letter-spacing:1.5px;color:var(--nsGold);display:block}.nsSpotlight b{display:block;font:500 12px system-ui,Cairo;margin-top:5px}
+.nsLast{display:flex;align-items:center;flex-wrap:wrap;gap:7px;font:400 9px system-ui,Cairo;color:#82939f}.nsLast>b{font-weight:500;color:#aebdc6}.nsLast>button{margin-inline-start:auto;color:var(--nsCyan);font-size:10px}
+.nsDock{display:grid;grid-template-columns:repeat(8,1fr);border:1px solid #ffffff14;border-radius:8px;background:#0c1622dd;flex-shrink:0}
+.nsDock button{display:flex;align-items:center;justify-content:center;gap:10px;padding:18px 7px;color:#b1bfcb;font:500 10px system-ui,Cairo;min-height:60px}.nsDock button+button{border-inline-start:1px solid #ffffff0b}.nsDock .nsIcon{width:19px;height:19px;color:#8098a9}.nsDock button:hover{background:#ffffff07;color:var(--nsGold)}.nsDock button:hover .nsIcon{color:var(--nsGold)}
+.nsFooter{display:flex;justify-content:space-between;font:500 7px system-ui,Cairo;letter-spacing:1.8px;color:#647787;padding-top:15px}
+/* An independent cinematic entry overlay; no missing iframe or artificial loading delay. */
+#nsLaunch{position:fixed;inset:0;background:#060c15;z-index:2147483646;isolation:isolate;color:#f4f7f9;display:flex;flex-direction:column;padding:30px 4vw;overflow:auto;touch-action:pan-y;font-family:system-ui,Cairo}
+.nsLaunchBg{position:absolute;inset:0;z-index:-3;background:linear-gradient(180deg,#060c15bb,#060c1544 40%,#060c15 94%),url('cairo-rain-road.webp') center/cover;animation:nsZoom 24s ease-in-out infinite alternate;opacity:.65}
+@keyframes nsZoom{to{transform:scale(1.07)}}
+#nsLaunch header{display:flex;justify-content:space-between;align-items:center;font-size:11px;letter-spacing:2px}#nsLaunch header b{font-size:21px;font-style:italic;letter-spacing:-1px}#nsLaunch header b span{font-family:Cairo;color:var(--nsGold);margin:0 10px}#nsLaunch header small{color:#aec2ce;font-size:8px}
+.nsLaunchContent{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;position:relative}
+.nsLaunchContent h1{font:900 italic clamp(76px,15vw,190px)/.86 system-ui;letter-spacing:-.08em;margin:25px 0 8px;filter:drop-shadow(0 5px 0 #2b3948) drop-shadow(0 20px 30px #0008);color:#eaf0f6}
+.nsLaunchContent h1 span{display:block;font:800 clamp(30px,4vw,55px)/1.6 Cairo,system-ui;letter-spacing:0;color:var(--nsGold);text-shadow:0 5px 25px #000}
+.nsLaunchContent>p{font:600 10px system-ui,Cairo;letter-spacing:4px;color:#b5c9d4;margin:5px 0 0}
+.nsLaunchContent .nsPrimary{max-width:325px;justify-content:center;gap:40px;margin-top:6px;animation:nsButtonGlow 3s ease-in-out infinite}.nsLaunchContent>small{font:500 9px system-ui,Cairo;color:#a8b8c5;margin-top:14px;letter-spacing:1px}
+@keyframes nsButtonGlow{50%{box-shadow:0 0 40px #edc07930}}
+.nsLaunchVehicle{height:170px;width:min(70vw,480px);display:flex;align-items:center;justify-content:center;position:relative}.nsLaunchVehicle:after{content:'';position:absolute;bottom:22%;width:100%;height:1px;background:linear-gradient(90deg,transparent,#edc079,transparent)}.nsLaunchVehicle img{max-height:145px;max-width:90%;filter:drop-shadow(0 20px 14px #000);animation:nsFloat 5s ease-in-out infinite;z-index:1}
+.nsLaunchRings{position:absolute;width:65vw;height:65vw;max-width:850px;max-height:850px;border:1px dashed #9ec0d219;box-shadow:0 0 0 65px #9ec0d205,0 0 0 140px #9ec0d203;border-radius:50%;left:calc(50% - min(32.5vw,425px));top:calc(50% - min(32.5vw,425px));z-index:-1;animation:nsOrbit 150s linear infinite;pointer-events:none}
+#nsLaunch footer{display:flex;justify-content:space-between;gap:10px;font:600 7px system-ui,Cairo;letter-spacing:2px;color:#8ba1b1}
+/* Pause and shift summary have a single, stable interaction layer. */
+.nsOverlay{position:fixed;inset:0;z-index:2147483640;background:#030912e8;display:grid;place-items:center;padding:16px;touch-action:pan-y}
+.nsPanel{width:min(100%,470px);max-height:94dvh;overflow:auto;background:linear-gradient(130deg,#17283b,#0b1421);border:1px solid #94d9e044;padding:30px;border-radius:12px;box-shadow:0 30px 90px #000a;color:#e8f0f4;touch-action:pan-y;animation:nsIn .2s ease}
+.nsPanel h2{font-size:34px;line-height:1.3;margin:16px 0 4px}.nsPanel>p{color:#97adbd;font-size:13px;margin:0 0 24px}.nsPanel>small{display:block;margin-top:18px;color:#8295a7;font-size:10px}
+.nsPauseStats{display:flex;justify-content:space-between;padding:20px 0;color:#9eb6c6;font-size:11px}
+.nsVolume{display:flex;align-items:center;gap:15px;color:#b9c9d5;font-size:12px;border-top:1px solid #ffffff14;padding:15px 0;margin-bottom:10px}.nsVolume input{flex:1;min-width:60px;accent-color:var(--nsGold)}
+.nsPair{display:flex;gap:10px}.nsPair>button{flex:1;border:1px solid #ffffff26;background:#ffffff06;border-radius:5px;padding:15px 12px;color:#e1e9ef;font:600 11px system-ui,Cairo;display:flex;align-items:center;justify-content:center}
+body.commandReport #screens{inset:0!important;z-index:50!important}body.commandReport #topBar,body.commandReport #navRail{display:none!important}
+.nsReport{background:radial-gradient(ellipse at 80% 10%,#183749,#070d16 70%);display:grid!important;place-items:center;overflow:auto;touch-action:pan-y;padding:24px!important;color:#eaf1f5;font-family:system-ui,Cairo}
+.nsReportPanel{width:min(900px,100%);padding:35px 42px;border:1px solid #ffffff20;border-radius:12px;background:#0e1929df;box-shadow:0 20px 80px #0007}
+.nsReportHeading{display:flex;justify-content:space-between;align-items:center;gap:20px}.nsReportHeading h1{font:800 45px/1.1 system-ui,Cairo;letter-spacing:-1.8px;margin:22px 0 14px}.nsReportHeading p{font-size:13px;color:#9bb0c0}.nsGrade{font:800 90px system-ui;color:var(--nsGold);text-align:center;min-width:100px}.nsGrade small{display:block;font:600 8px system-ui,Cairo;color:var(--nsMuted);letter-spacing:1px}
+.nsReportStats{display:grid;grid-template-columns:repeat(4,1fr);gap:15px;padding:24px 0;border-block:1px solid #ffffff16;margin:15px 0}.nsReportStats b{font:500 30px system-ui;display:block;margin-top:6px}.nsReportStats em{font:500 11px system-ui}
+.nsReportReward{display:flex;align-items:center;gap:20px;background:#64dce509;border:1px solid #64dce522;padding:18px;border-radius:8px}.nsReportReward>.nsIcon{width:32px;height:32px;color:var(--nsCyan)}.nsReportReward h3{font-size:16px;margin:0 0 6px}.nsReportReward p{font-size:11px;color:#9eb4c1;margin:0}.nsReportReward strong{margin-inline-start:auto;color:var(--nsCyan);font:600 30px system-ui}.nsReportReward strong small{font-size:10px;margin-inline-start:4px}
+.nsReportNote{font-size:11px;line-height:1.7;color:#8fa4b5;margin:18px 0}
+.nsLogbook{max-height:45vh;overflow:auto;touch-action:pan-y;margin:15px 0}.nsLogbook>div{display:flex;justify-content:space-between;gap:15px;padding:14px 0;border-bottom:1px solid #ffffff19;font-size:12px}.nsLogbook small{display:block;color:#8fa4b5;font-size:9px}
+#nsContractHud{position:absolute;inset-inline-start:12px;top:40%;display:flex;align-items:center;gap:8px;padding:9px 12px 13px;background:#06131ce8;border:1px solid #67d9e13d;border-radius:7px;color:#a1eaf0;max-width:220px;min-width:155px;pointer-events:auto;text-align:start;box-shadow:0 5px 25px #0006}
+#nsContractHud>.nsIcon{width:17px;height:17px}#nsContractHud b{display:block;font:600 11px system-ui,Cairo}#nsContractHud small{display:block;font:400 8px system-ui,Cairo;color:#94aebc;margin-top:3px}#nsContractHud>i{position:absolute;bottom:0;left:0;width:var(--progress);max-width:100%;height:2px;background:var(--nsCyan);transition:width .25s}
+/* Consistent materials on existing secondary screens, preserving their controls. */
+body.menuUI:not(.commandHub) #topBar{background:#0b1726!important;border-color:#73cddc30!important}
+body.menuUI:not(.commandHub) #navRail{background:#0c1624!important}
+body.menuUI:not(.commandHub) #navRail button.on{background:#68d9e411!important;box-shadow:inset 2px 0 #68d9e4!important;color:#90e8ed!important}
+body.menuUI:not(.commandHub) .scrHead h1{background:none!important;color:#e4eef4!important;-webkit-text-fill-color:#e4eef4!important}
+body.menuUI:not(.commandHub) .pn{backdrop-filter:none!important;background:linear-gradient(145deg,#142235ee,#0b1523f5)!important;border-color:#91bacd2c!important}
+@media(min-width:1500px){.nsDashboard{gap:8%}.nsVehicle{min-height:260px}.nsRouteCard{padding:30px}.nsContractCard{padding:22px}}
+@media(max-height:760px) and (min-width:901px){body.commandHub #screens .nsHub{padding-top:18px!important}.nsHeader{padding-bottom:15px}.nsDashboard{margin:16px auto;gap:5%}.nsHero h1{font-size:46px}.nsVehicle{min-height:165px}.nsVehicle>img{max-height:125px;width:75%}.nsIntro{font-size:10px}.nsRouteCard{padding:17px}.nsRouteCard h2{font-size:23px;margin:10px 0}.nsTime{margin:14px 0 12px}.nsContractCard{padding:13px 17px}.nsDock button{padding:12px 5px;min-height:48px}.nsLaunchVehicle{height:135px}.nsLaunchContent h1{font-size:120px}}
+@media(max-width:900px){body.commandHub #screens .nsHub{padding:18px 22px!important}.nsDashboard{gap:24px;margin:24px auto}.nsHero h1{font-size:42px;letter-spacing:-2px}.nsBrand small{display:none}.nsLive{display:none}.nsHeroStats{gap:10px}.nsHeroStats small{font-size:7px;letter-spacing:.5px}.nsHeroStats strong{font-size:24px}.nsVehicle{min-height:170px}.nsVehicle>img{max-height:130px}.nsRouteCard{padding:17px}.nsRouteCard h2{font-size:23px}.nsContractCard{padding:14px}.nsContractChoices button{font-size:9px}.nsContractChoices .nsIcon{display:none}.nsDock button{flex-direction:column;gap:7px;font-size:9px;padding:12px 4px}.nsFooter{font-size:6px;letter-spacing:1px}.nsRouteMeta{gap:7px}.nsRouteMeta span+span{padding-inline-start:7px}.nsReportHeading h1{font-size:36px}}
+@media(max-width:640px) and (orientation:portrait){body.commandHub #screens .nsHub{padding:20px 18px!important}.nsDashboard{grid-template-columns:1fr;gap:27px;margin-top:25px}.nsHero h1{font-size:48px}.nsHero{min-height:410px}.nsVehicle{min-height:175px}.nsVehicle>img{width:83%;max-height:137px}.nsIntro{font-size:11px}.nsHeroStats{padding-top:15px;margin-top:16px}.nsHeroStats strong{font-size:26px}.nsHeroStats small{font-size:8px}.nsOperations{gap:14px}.nsRouteCard{padding:22px}.nsRouteCard h2{font-size:26px}.nsContractCard{padding:18px}.nsContractChoices button{font-size:10px}.nsContractChoices .nsIcon{display:block}.nsDock{grid-template-columns:repeat(4,1fr);margin-top:0}.nsDock button{min-height:62px;font-size:10px}.nsDock button:nth-child(n+5){border-top:1px solid #ffffff0b}.nsFooter{line-height:1.8;gap:20px;padding-bottom:20px}.nsLaunchContent h1{font-size:100px}.nsLaunchContent>p{font-size:8px;letter-spacing:1.5px}.nsLaunchContent h1 span{font-size:44px}.nsLaunchVehicle{height:170px;width:90vw}.nsLaunchVehicle img{max-height:145px}#nsLaunch header small{max-width:130px;text-align:end;line-height:1.6}#nsLaunch footer{font-size:6px;letter-spacing:.5px}.nsReportPanel{padding:22px}.nsReportHeading h1{font-size:30px}.nsGrade{font-size:60px;min-width:65px}.nsReportStats{grid-template-columns:1fr 1fr}.nsReportStats b{font-size:26px}.nsReportReward{gap:12px;padding:12px}.nsReportReward h3{font-size:13px}.nsReportReward strong{font-size:24px}.nsPanel{padding:24px}#nsContractHud{top:36%;max-width:175px;padding:7px 8px 10px}#nsContractHud b{font-size:9px}#nsContractHud small{font-size:7px}}
+@media(max-height:500px) and (orientation:landscape){body.commandHub #screens .nsHub{padding:14px 22px!important}.nsHeader{padding-bottom:12px}.nsDashboard{min-height:440px;align-items:start}.nsHero{min-height:440px}.nsHero h1{font-size:39px}.nsBrand{font-size:25px}.nsHeroStats strong{font-size:23px}.nsDock button{min-height:45px}.nsLaunchContent{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:25px 1fr 50px 20px;gap:0 30px;align-content:center;padding:20px 4vw}.nsLaunchContent>.nsEyebrow{grid-column:1;grid-row:1;justify-content:center}.nsLaunchContent h1{grid-row:2/4;grid-column:1;font-size:100px;margin:10px 0}.nsLaunchContent h1 span{font-size:32px}.nsLaunchContent>p{grid-row:4;grid-column:1;font-size:7px;letter-spacing:1px}.nsLaunchVehicle{grid-column:2;grid-row:1/3;width:100%;height:130px}.nsLaunchContent .nsPrimary{grid-column:2;grid-row:3;padding:12px!important;min-height:40px}.nsLaunchContent>small{grid-column:2;grid-row:4;font-size:7px}.nsPanel{padding:18px;width:min(650px,96vw)}.nsPanel h2{font-size:24px;margin:8px 0}.nsPanel>p{margin-bottom:12px}.nsPauseStats{padding:12px 0}.nsVolume{padding:9px 0;margin-bottom:5px}.nsPanel>small{margin-top:10px}.nsReport{display:block!important}.nsReportPanel{margin:auto}#nsContractHud{top:43%;max-width:180px;min-width:130px}#nsContractHud b{font-size:9px}#nsContractHud small{font-size:7px}}
+@media(prefers-reduced-motion:reduce){.nsHub *,.nsHub *:after,#nsLaunch *,#nsLaunch *:after,.nsOverlay *,.nsReport *{animation:none!important;transition:none!important}}
+@media(max-width:640px) and (orientation:portrait){.nsDashboard{flex:0 0 auto;min-height:auto}.nsHero{min-height:0}.nsHero h1{font-size:43px}.nsVehicle{min-height:220px;flex:none;padding-bottom:55px}.nsVehicle .nsSprite{width:90%;max-width:370px}.nsHeroStats{margin-top:10px}.nsDock{flex:none}.nsIntro{margin-bottom:5px}.nsHeader{padding-bottom:18px}}
+@media(max-height:760px) and (min-width:641px){.nsVehicle .nsSprite{max-width:360px}.nsVehicle{min-height:210px}}
+@media(max-width:640px){.nsHeader{gap:10px}.nsHeaderRight{gap:7px}.nsBrand{font-size:29px;gap:9px}.nsBrand>span{font-size:20px}.nsLang{padding:6px 9px!important}.nsSquare{width:33px;height:33px}}
