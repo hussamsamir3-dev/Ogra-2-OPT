@@ -60,5 +60,37 @@
     } catch(e) {}
   }
 
+
+  function paint(){
+    try {
+      const G = (typeof GAME !== 'undefined') && GAME.G; if (!G) return;
+      const v = el('dpCCv'), b = el('dpCCb'); if (!v || !b) return;
+      const dp = G.dp || {};
+      const t = Math.round(dp.target || 40);
+      if (v.textContent !== String(t)) v.textContent = t;
+      b.classList.toggle('on', !!dp.cruise);
+      const label = dp.cruise ? tr('CC ON', 'مثبّت') : 'CC';
+      if (b.textContent !== label) b.textContent = label;
+    } catch(e) {}
+  }
+
+  /* hold the set speed while cruise is engaged */
+  if (typeof updateGame === 'function') {
+    const _ug = updateGame;
+    updateGame = function(G, dt, inp){
+      const out = _ug.apply(this, arguments);
+      try {
+        const dp = G && G.dp;
+        if (dp && dp.cruise && G.car && G.car.on && !G.car.hand && G.car.sel === 'D') {
+          const target = (dp.target || 40)/3.6, v = G.car.vx || 0;
+          if (G.car.brk > .08) { dp.cruise = false; }              /* braking cancels it */
+          else if (v < target - .3) G.car.thr = Math.min(1, (G.car.thr || 0) + dt*1.6);
+          else if (v > target + .3) G.car.thr = Math.max(0, (G.car.thr || 0) - dt*2.2);
+        }
+      } catch(e) {}
+      return out;
+    };
+  }
+
   setInterval(hudControls, 250);
 })();
