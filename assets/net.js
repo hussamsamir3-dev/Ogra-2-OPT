@@ -7,8 +7,8 @@
    where nothing is banked.
    ============================================================ */
 (function () {
-  const SUPABASE_URL = 'https://zmbyrpiiqvfrmszvhvvh.supabase.co';
-  const SUPABASE_KEY = 'sb_publishable_pTIK6OotwX1_23Xyy2sQfw_6GAJIu6K';
+  const SUPABASE_URL = 'https://xncztvekfhyihshlatvz.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_oJOOzGXc3xgl1k44rFlyzQ_TSaJ3gb4';
   const FN = SUPABASE_URL + '/functions/v1';
 
   const NET = window.OGRA_NET = {
