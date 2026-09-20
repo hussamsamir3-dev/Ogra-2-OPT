@@ -82,20 +82,20 @@ body.dpReduceMotion #dpDialog,body.dpReduceMotion #dpDialog .dpPanel{animation:n
 }
 
 /* ---- Driver+ controls on the driving screen ---- */
-#dpHud{position:fixed;z-index:60;display:flex;align-items:center;gap:8px;
-  inset-block-start:max(64px,calc(env(safe-area-inset-top) + 58px));
-  inset-inline-end:max(8px,env(safe-area-inset-right));
+#dpHud{position:fixed;z-index:60;display:flex;align-items:center;gap:10px;
+  inset-block-end:max(14px,env(safe-area-inset-bottom));
+  inset-inline-end:max(10px,env(safe-area-inset-right));
   font-family:Cairo,system-ui,sans-serif}
-#dpHud button{min-width:40px;min-height:40px;padding:.3em .6em;border-radius:12px;cursor:pointer;
+#dpHud button{min-width:52px;min-height:52px;padding:.38em .78em;border-radius:15px;cursor:pointer;
   background:rgba(9,15,30,.82);border:1px solid rgba(255,196,102,.38);color:#ffdfae;
-  font:800 14px Cairo,system-ui;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+  font:800 18px Cairo,system-ui;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
 #dpHud button:active{filter:brightness(1.2);transform:scale(.96)}
-#dpCC{display:flex;align-items:center;gap:4px;padding:3px;border-radius:14px;
+#dpCC{display:flex;align-items:center;gap:5px;padding:4px;border-radius:18px;
   background:rgba(9,15,30,.7);border:1px solid rgba(140,190,255,.2)}
-#dpCC b{min-width:2.6em;text-align:center;color:#eaf3ff;font:800 14px Rajdhani,Cairo,system-ui}
+#dpCC b{min-width:2.6em;text-align:center;color:#eaf3ff;font:800 18px Rajdhani,Cairo,system-ui}
 #dpCC #dpCCb.on{background:linear-gradient(180deg,#ffd79a,#f0b455);color:#1b1204;border-color:transparent}
-html.ogShortScreen #dpHud{inset-block-start:max(50px,calc(env(safe-area-inset-top) + 44px))}
-html.ogTiny #dpHud button{min-width:36px;min-height:36px;font-size:12.5px}
+html.ogTiny #dpHud button{min-width:47px;min-height:47px;font-size:16px}
+html.ogTiny #dpCC b{font-size:16px}
 
 /* ---- one type scale for the whole game ---- */
 :root{--ogText:15px;--ogGap:9px}
