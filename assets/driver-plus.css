@@ -114,3 +114,24 @@ body.commandHub .nsHub, body.commandHub .nsOverlay, body.commandHub .nsReport{fo
 html.ogTiny .nsHub h1{font-size:calc(var(--ogText)*2.4)!important}
 html.ogShortScreen .nsHub h1{font-size:calc(var(--ogText)*2.2)!important}
 html.ogShortScreen .nsHub p{font-size:calc(var(--ogText)*.9)!important}
+
+
+/* ---- phone layout: keep the bottom controls clear of each other ---- */
+@media (max-height:520px), (max-width:900px){
+  #hud .h-tr #dpHud{gap:4px}
+  #dpHud button.hb{min-width:38px;min-height:38px;font-size:13px}
+  #dpCC b{min-width:2.1em;font-size:13px;padding:.22em .35em}
+}
+/* the second connection badge is gone; the game's own stays where it is */
+#ogNetStatus{display:none!important}
+
+
+/* ---- very small screens: stack the speed controls in the column ---- */
+@media (max-height:430px){
+  #hud .h-tr #dpHud{flex-direction:column;align-items:flex-end;gap:4px}
+  #dpCC{flex-direction:column;gap:4px}
+  #dpHud button.hb{min-width:34px;min-height:34px;font-size:12.5px;padding:.15em .3em}
+  #dpCC b{min-width:0;width:34px;font-size:12.5px;padding:.18em 0}
+}
+/* Driver+ ships its own cruise button; ours replaces it, so only one is shown */
+#dpCruiseBtn{display:none!important}
