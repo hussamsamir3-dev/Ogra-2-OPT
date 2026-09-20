@@ -1,0 +1,636 @@
+{
+  "routes": [
+    {
+      "id": "cairo_hurghada",
+      "fare": 420,
+      "lvl": 19,
+      "km": 450,
+      "gameM": 26000,
+      "stops": 6
+    },
+    {
+      "id": "cairo_gouna",
+      "fare": 470,
+      "lvl": 19,
+      "km": 470,
+      "gameM": 27000,
+      "stops": 6
+    },
+    {
+      "id": "cairo_sharm",
+      "fare": 520,
+      "lvl": 19,
+      "km": 490,
+      "gameM": 28000,
+      "stops": 6
+    },
+    {
+      "id": "maadi_tahrir",
+      "fare": 8,
+      "lvl": 1,
+      "km": 13,
+      "gameM": 3400,
+      "stops": 6
+    },
+    {
+      "id": "giza_haram",
+      "fare": 6,
+      "lvl": 1,
+      "km": 10,
+      "gameM": 3000,
+      "stops": 5
+    },
+    {
+      "id": "ramses_hussein",
+      "fare": 7,
+      "lvl": 1,
+      "km": 5,
+      "gameM": 2600,
+      "stops": 5
+    },
+    {
+      "id": "asher_ramses",
+      "fare": 13,
+      "lvl": 2,
+      "km": 17,
+      "gameM": 4600,
+      "stops": 6
+    },
+    {
+      "id": "alex_corniche",
+      "fare": 7,
+      "lvl": 2,
+      "km": 18,
+      "gameM": 4800,
+      "stops": 8
+    },
+    {
+      "id": "asher_shorouk",
+      "fare": 18,
+      "lvl": 4,
+      "km": 30,
+      "gameM": 5400,
+      "stops": 5
+    },
+    {
+      "id": "asher_capital",
+      "fare": 34,
+      "lvl": 6,
+      "km": 45,
+      "gameM": 6600,
+      "stops": 5
+    },
+    {
+      "id": "banha",
+      "fare": 30,
+      "lvl": 6,
+      "km": 48,
+      "gameM": 6200,
+      "stops": 5
+    },
+    {
+      "id": "cairo_sokhna",
+      "fare": 95,
+      "lvl": 10,
+      "km": 120,
+      "gameM": 8200,
+      "stops": 4
+    },
+    {
+      "id": "cairo_alex",
+      "fare": 150,
+      "lvl": 13,
+      "km": 220,
+      "gameM": 11000,
+      "stops": 6
+    },
+    {
+      "id": "bus_tahrir_korba",
+      "fare": 14,
+      "lvl": 1,
+      "km": 14,
+      "gameM": 4800,
+      "stops": 6
+    },
+    {
+      "id": "bus_ramses_haram",
+      "fare": 14,
+      "lvl": 2,
+      "km": 19,
+      "gameM": 5400,
+      "stops": 6
+    },
+    {
+      "id": "mini_ramses_october",
+      "fare": 25,
+      "lvl": 4,
+      "km": 36,
+      "gameM": 6400,
+      "stops": 6
+    },
+    {
+      "id": "coach_cairo_alex",
+      "fare": 260,
+      "lvl": 13,
+      "km": 225,
+      "gameM": 11500,
+      "stops": 5
+    }
+  ],
+  "vehicles": [
+    {
+      "id": "v_suzuki",
+      "price": 95000,
+      "lvl": 1,
+      "cat": "micro",
+      "seats": 7,
+      "tank": 40,
+      "fuel": "b92",
+      "lp100": 7.4,
+      "rim": "steel6"
+    },
+    {
+      "id": "v_foton",
+      "price": 120000,
+      "lvl": 2,
+      "cat": "micro",
+      "seats": 8,
+      "tank": 45,
+      "fuel": "b92",
+      "lp100": 8.2,
+      "rim": "steel6"
+    },
+    {
+      "id": "v_n300",
+      "price": 0,
+      "lvl": 1,
+      "cat": "micro",
+      "seats": 11,
+      "tank": 45,
+      "fuel": "diesel",
+      "lp100": 7.8,
+      "rim": "steel6"
+    },
+    {
+      "id": "micro_classic",
+      "price": 165000,
+      "lvl": 5,
+      "cat": "micro",
+      "seats": 14,
+      "tank": 70,
+      "fuel": "diesel",
+      "lp100": 9.8,
+      "rim": "steel6"
+    },
+    {
+      "id": "van_euro",
+      "price": 190000,
+      "lvl": 4,
+      "cat": "micro",
+      "seats": 14,
+      "tank": 70,
+      "fuel": "diesel",
+      "lp100": 10.5,
+      "rim": "steel6"
+    },
+    {
+      "id": "micro_hr",
+      "price": 230000,
+      "lvl": 6,
+      "cat": "micro",
+      "seats": 15,
+      "tank": 75,
+      "fuel": "diesel",
+      "lp100": 11.2,
+      "rim": "steel6"
+    },
+    {
+      "id": "micro_jumbo",
+      "price": 280000,
+      "lvl": 7,
+      "cat": "micro",
+      "seats": 16,
+      "tank": 75,
+      "fuel": "diesel",
+      "lp100": 11.8,
+      "rim": "steel6"
+    },
+    {
+      "id": "v_shineray",
+      "price": 420000,
+      "lvl": 8,
+      "cat": "minibus",
+      "seats": 18,
+      "tank": 80,
+      "fuel": "diesel",
+      "lp100": 12.8,
+      "rim": "bus"
+    },
+    {
+      "id": "van_xl",
+      "price": 450000,
+      "lvl": 8,
+      "cat": "minibus",
+      "seats": 19,
+      "tank": 85,
+      "fuel": "diesel",
+      "lp100": 13.4,
+      "rim": "bus"
+    },
+    {
+      "id": "v_joya6",
+      "price": 480000,
+      "lvl": 9,
+      "cat": "minibus",
+      "seats": 19,
+      "tank": 90,
+      "fuel": "diesel",
+      "lp100": 13.6,
+      "rim": "bus"
+    },
+    {
+      "id": "mini_rosa",
+      "price": 700000,
+      "lvl": 10,
+      "cat": "minibus",
+      "seats": 25,
+      "tank": 95,
+      "fuel": "diesel",
+      "lp100": 16,
+      "rim": "bus"
+    },
+    {
+      "id": "coaster",
+      "price": 640000,
+      "lvl": 11,
+      "cat": "minibus",
+      "seats": 26,
+      "tank": 95,
+      "fuel": "diesel",
+      "lp100": 16.5,
+      "rim": "bus"
+    },
+    {
+      "id": "v_isuzu",
+      "price": 720000,
+      "lvl": 12,
+      "cat": "minibus",
+      "seats": 28,
+      "tank": 110,
+      "fuel": "diesel",
+      "lp100": 17.5,
+      "rim": "bus"
+    },
+    {
+      "id": "v_higer",
+      "price": 780000,
+      "lvl": 12,
+      "cat": "minibus",
+      "seats": 29,
+      "tank": 115,
+      "fuel": "diesel",
+      "lp100": 18,
+      "rim": "bus"
+    },
+    {
+      "id": "v_yutong77",
+      "price": 850000,
+      "lvl": 13,
+      "cat": "minibus",
+      "seats": 30,
+      "tank": 130,
+      "fuel": "diesel",
+      "lp100": 18.8,
+      "rim": "bus"
+    },
+    {
+      "id": "citybus",
+      "price": 1250000,
+      "lvl": 15,
+      "cat": "bus",
+      "seats": 35,
+      "tank": 220,
+      "fuel": "diesel",
+      "lp100": 31,
+      "rim": "bus"
+    },
+    {
+      "id": "v_zk6128",
+      "price": 1600000,
+      "lvl": 16,
+      "cat": "bus",
+      "seats": 38,
+      "tank": 240,
+      "fuel": "diesel",
+      "lp100": 32.5,
+      "rim": "bus"
+    },
+    {
+      "id": "coach",
+      "price": 2400000,
+      "lvl": 19,
+      "cat": "bus",
+      "seats": 49,
+      "tank": 300,
+      "fuel": "diesel",
+      "lp100": 29.5,
+      "rim": "bus"
+    },
+    {
+      "id": "v_tourismo",
+      "price": 3400000,
+      "lvl": 22,
+      "cat": "bus",
+      "seats": 51,
+      "tank": 350,
+      "fuel": "diesel",
+      "lp100": 30.5,
+      "rim": "bus"
+    },
+    {
+      "id": "car_old",
+      "price": 55000,
+      "lvl": 1,
+      "cat": "car",
+      "seats": 3,
+      "tank": 38,
+      "fuel": "b92",
+      "lp100": 7.8,
+      "rim": "hubcap"
+    },
+    {
+      "id": "hatch_city",
+      "price": 90000,
+      "lvl": 2,
+      "cat": "car",
+      "seats": 3,
+      "tank": 39,
+      "fuel": "b92",
+      "lp100": 8.6,
+      "rim": "hubcap"
+    },
+    {
+      "id": "hatch",
+      "price": 140000,
+      "lvl": 4,
+      "cat": "car",
+      "seats": 3,
+      "tank": 45,
+      "fuel": "b92",
+      "lp100": 6.6,
+      "rim": "alloy5"
+    },
+    {
+      "id": "sedan_compact",
+      "price": 170000,
+      "lvl": 3,
+      "cat": "car",
+      "seats": 4,
+      "tank": 48,
+      "fuel": "b92",
+      "lp100": 7.2,
+      "rim": "alloy5"
+    },
+    {
+      "id": "sedan16",
+      "price": 260000,
+      "lvl": 7,
+      "cat": "car",
+      "seats": 4,
+      "tank": 60,
+      "fuel": "b92",
+      "lp100": 7.6,
+      "rim": "multi"
+    },
+    {
+      "id": "sedan_mid",
+      "price": 380000,
+      "lvl": 9,
+      "cat": "car",
+      "seats": 4,
+      "tank": 50,
+      "fuel": "b92",
+      "lp100": 7.1,
+      "rim": "multi"
+    }
+  ],
+  "parts": [
+    {
+      "id": "engine",
+      "max": 5,
+      "base": 5000,
+      "icon": "engine"
+    },
+    {
+      "id": "turbo",
+      "max": 3,
+      "base": 11000,
+      "icon": "turbo"
+    },
+    {
+      "id": "gearbox",
+      "max": 4,
+      "base": 4500,
+      "icon": "gear"
+    },
+    {
+      "id": "susp",
+      "max": 5,
+      "base": 3800,
+      "icon": "susp"
+    },
+    {
+      "id": "brakes",
+      "max": 4,
+      "base": 3000,
+      "icon": "brake"
+    },
+    {
+      "id": "tires",
+      "max": 4,
+      "base": 3200,
+      "icon": "tire"
+    },
+    {
+      "id": "cooling",
+      "max": 3,
+      "base": 2400,
+      "icon": "temp"
+    },
+    {
+      "id": "tank",
+      "max": 3,
+      "base": 2200,
+      "icon": "fuel"
+    },
+    {
+      "id": "body",
+      "max": 4,
+      "base": 4800,
+      "icon": "shield"
+    },
+    {
+      "id": "comfort",
+      "max": 4,
+      "base": 4200,
+      "icon": "seat"
+    },
+    {
+      "id": "lights",
+      "max": 2,
+      "base": 2000,
+      "icon": "light"
+    },
+    {
+      "id": "radar",
+      "max": 1,
+      "base": 3500,
+      "icon": "radar"
+    },
+    {
+      "id": "cng",
+      "max": 1,
+      "base": 16000,
+      "icon": "gas",
+      "only": "car"
+    }
+  ],
+  "rims": [
+    {
+      "id": "hubcap",
+      "price": 0,
+      "n": {
+        "en": "Hubcap",
+        "ar": "طاسة"
+      },
+      "k": 0.62,
+      "fit": [
+        "micro",
+        "car"
+      ]
+    },
+    {
+      "id": "steel6",
+      "price": 900,
+      "n": {
+        "en": "Steel rim",
+        "ar": "جنط حديد"
+      },
+      "k": 0.6,
+      "fit": [
+        "micro",
+        "minibus",
+        "car"
+      ]
+    },
+    {
+      "id": "bus",
+      "price": 2500,
+      "n": {
+        "en": "Heavy steel",
+        "ar": "جنط تقيل"
+      },
+      "k": 0.58,
+      "fit": [
+        "minibus",
+        "city",
+        "coach"
+      ]
+    },
+    {
+      "id": "alloyBus",
+      "price": 6000,
+      "n": {
+        "en": "Polished alloy",
+        "ar": "جنط ألومنيوم لامع"
+      },
+      "k": 0.6,
+      "fit": [
+        "minibus",
+        "city",
+        "coach"
+      ]
+    },
+    {
+      "id": "alloy5",
+      "price": 3500,
+      "n": {
+        "en": "5-spoke alloy",
+        "ar": "جنط 5 رجول"
+      },
+      "k": 0.66,
+      "fit": [
+        "micro",
+        "car"
+      ]
+    },
+    {
+      "id": "alloy10",
+      "price": 5000,
+      "n": {
+        "en": "10-spoke alloy",
+        "ar": "جنط 10 رجول"
+      },
+      "k": 0.68,
+      "fit": [
+        "micro",
+        "car"
+      ]
+    },
+    {
+      "id": "multi",
+      "price": 7500,
+      "n": {
+        "en": "Multi-spoke sport",
+        "ar": "جنط رياضي"
+      },
+      "k": 0.7,
+      "fit": [
+        "car",
+        "micro"
+      ]
+    }
+  ],
+  "fuels": {
+    "diesel": {
+      "price": 10.25,
+      "real": 20.5,
+      "n": {
+        "en": "Diesel",
+        "ar": "سولار"
+      }
+    },
+    "b80": {
+      "price": 10.4,
+      "real": 20.75,
+      "n": {
+        "en": "Petrol 80",
+        "ar": "بنزين 80"
+      }
+    },
+    "b92": {
+      "price": 15.5,
+      "real": 22.25,
+      "n": {
+        "en": "Petrol 92",
+        "ar": "بنزين 92"
+      }
+    },
+    "b95": {
+      "price": 17,
+      "real": 24,
+      "n": {
+        "en": "Petrol 95",
+        "ar": "بنزين 95"
+      }
+    },
+    "cng": {
+      "price": 8.5,
+      "real": 13,
+      "n": {
+        "en": "Natural gas",
+        "ar": "غاز طبيعي"
+      }
+    }
+  }
+}
