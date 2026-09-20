@@ -8,7 +8,7 @@
   function prefs(){ return Object.assign({}, defaults, S().set.driverPlus || {}); }
   const btn = (a,label) => `<button type="button" data-drive="${a}">${label}</button>`;
   let oldFocus, wasPaused, dialogG, uiClock=0, slowTime=0, frameEMA=16.7, lastDraw=0;
-  window.OGRA_BUILD = '2026-09-20-driver-plus-3';
+  window.OGRA_BUILD = '2026-09-20-driver-plus-4';
   const prep=prepSession;prepSession=function(G){
     const out=prep.apply(this,arguments);
     if(G.mode!=='attract'){
@@ -91,7 +91,14 @@
     if(key==='c'&&!e.repeat&&!/INPUT|TEXTAREA|SELECT/.test(tag)&&GAME.state==='play'&&!GAME.paused){e.preventDefault();cruise()}
   },true);
   const toHub=UI.toHub;UI.toHub=function(){el('dpDialog')?.remove();return toHub.apply(this,arguments)};
-  const show=UI.show;UI.show=function(name){const out=show.apply(this,arguments);if(name==='hub'){const dock=document.querySelector('.nsDock');if(dock&&!dock.querySelector('[data-drive]'))dock.insertAdjacentHTML('beforeend',btn('open','<span class="dpOrbit">◉</span><span>Driver+</span>'));quality()}return out};
+  function ensureStudioButton(){
+    const dock=document.querySelector('.nsDock');if(!dock||dock.querySelector('[data-drive="open"]'))return;
+    dock.insertAdjacentHTML('beforeend',btn('open',`<span class="dpOrbit">◉</span><span>${tr('Driving Studio','استوديو السواقة')}</span>`));
+  }
+  const show=UI.show;UI.show=function(name){const out=show.apply(this,arguments);if(name==='hub'){setTimeout(ensureStudioButton,0);quality()}return out};
+  const studioWatch=new MutationObserver(ensureStudioButton);
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>{studioWatch.observe(document.body,{childList:true,subtree:true});ensureStudioButton()},{once:true});
+  else{studioWatch.observe(document.body,{childList:true,subtree:true});ensureStudioButton()}
   const build=UI.buildHud;UI.buildHud=function(G){
     const out=build.apply(this,arguments);run(G);
     const gas=el('pGas')?.querySelector('span');if(gas)gas.textContent=tr('ACCELERATOR','بنزين');
