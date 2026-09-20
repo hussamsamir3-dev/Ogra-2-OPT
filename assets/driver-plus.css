@@ -81,21 +81,25 @@ body.dpReduceMotion #dpDialog,body.dpReduceMotion #dpDialog .dpPanel{animation:n
   #dpDialog button{min-height:40px;padding:.45em .8em}
 }
 
-/* ---- Driver+ controls on the driving screen ---- */
-#dpHud{position:fixed;z-index:60;display:flex;align-items:center;gap:10px;
-  inset-block-end:max(14px,env(safe-area-inset-bottom));
-  inset-inline-end:max(10px,env(safe-area-inset-right));
-  font-family:Cairo,system-ui,sans-serif}
-#dpHud button{min-width:52px;min-height:52px;padding:.38em .78em;border-radius:15px;cursor:pointer;
-  background:rgba(9,15,30,.82);border:1px solid rgba(255,196,102,.38);color:#ffdfae;
-  font:800 18px Cairo,system-ui;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
-#dpHud button:active{filter:brightness(1.2);transform:scale(.96)}
-#dpCC{display:flex;align-items:center;gap:5px;padding:4px;border-radius:18px;
-  background:rgba(9,15,30,.7);border:1px solid rgba(140,190,255,.2)}
-#dpCC b{min-width:2.6em;text-align:center;color:#eaf3ff;font:800 18px Rajdhani,Cairo,system-ui}
-#dpCC #dpCCb.on{background:linear-gradient(180deg,#ffd79a,#f0b455);color:#1b1204;border-color:transparent}
-html.ogTiny #dpHud button{min-width:47px;min-height:47px;font-size:16px}
-html.ogTiny #dpCC b{font-size:16px}
+/* ---- Driver+ controls on the driving screen ----
+   They sit inside the HUD's own top-right column, so they stack and scale
+   with the lights, hazard and pause buttons instead of floating over the
+   instrument cluster. */
+#hud .h-tr #dpHud{display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+#dpHud button.hb{min-width:clamp(40px,5.2vmin,54px);min-height:clamp(40px,5.2vmin,54px);
+  font:800 clamp(14px,2vmin,18px) Cairo,system-ui;padding:.2em .5em}
+#dpHud .dpOrbit{color:#ffd79a;font-size:1.05em;line-height:1}
+#dpCC{display:flex;align-items:center;gap:6px}
+#dpCC b{min-width:2.4em;text-align:center;color:#eaf3ff;
+  font:800 clamp(14px,2vmin,18px) Rajdhani,Cairo,system-ui;
+  padding:.28em .45em;border-radius:12px;background:rgba(9,15,30,.7);
+  border:1px solid rgba(140,190,255,.22)}
+#dpCC #dpCCb.on{background:linear-gradient(180deg,#ffd79a,#f0b455)!important;color:#1b1204!important;
+  border-color:transparent!important}
+@media (max-height:520px){
+  #dpHud button.hb{min-width:38px;min-height:38px;font-size:13px}
+  #dpCC b{font-size:13px;min-width:2.2em}
+}
 
 /* ---- one type scale for the whole game ---- */
 :root{--ogText:15px;--ogGap:9px}

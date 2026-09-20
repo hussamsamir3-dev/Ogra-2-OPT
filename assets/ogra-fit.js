@@ -29,20 +29,21 @@
   function hudControls(){
     try {
       const playing = typeof GAME !== 'undefined' && GAME.state === 'play';
+      const col = document.querySelector('#hud .h-tr');
       let bar = el('dpHud');
-      if (!playing) { if (bar) bar.remove(); return; }
-      if (!bar) {
+      if (!playing || !col) { if (bar) bar.remove(); return; }
+      if (!bar || bar.parentElement !== col) {
+        if (bar) bar.remove();
         bar = document.createElement('div'); bar.id = 'dpHud';
         bar.innerHTML =
-          `<button type="button" data-drive="open" title="${tr('Driving studio','استوديو السواقة')}"><span class="dpOrbit">◉</span></button>
+          `<button type="button" class="pn hb" data-drive="open" title="${tr('Driving studio','استوديو السواقة')}"><span class="dpOrbit">◉</span></button>
            <div id="dpCC">
-             <button type="button" data-dp="slower">−</button>
+             <button type="button" class="pn hb" data-dp="faster">+</button>
              <b id="dpCCv">40</b>
-             <button type="button" data-dp="faster">+</button>
-             <button type="button" data-dp="cruise" id="dpCCb">CC</button>
+             <button type="button" class="pn hb" data-dp="slower">−</button>
+             <button type="button" class="pn hb" data-dp="cruise" id="dpCCb">CC</button>
            </div>`;
-        document.body.appendChild(bar);
-        place(); requestAnimationFrame(place); setTimeout(place, 120);   /* once the HUD has laid out */
+        col.appendChild(bar);                       /* lives in the HUD column, so it stacks with the rest */
         bar.addEventListener('click', e => {
           const b = e.target.closest('[data-dp]'); if (!b) return;
           e.preventDefault(); e.stopPropagation();
@@ -55,49 +56,9 @@
           paint();
         });
       }
-      place();
       paint();
     } catch(e) {}
   }
 
-  /* sit beside the horn, bottom right, wherever the HUD puts it */
-  function place(){
-    const bar = el('dpHud'); if (!bar) return;
-    const horn = document.getElementById('bHorn');
-    const r = horn && horn.getBoundingClientRect();
-    bar.style.position = 'fixed';
-    if (r && r.width > 4) {
-      /* pinned by its right edge to the horn, so its own width never matters */
-      const gap = 12;
-      /* clear the logical insets FIRST: in a right-to-left page
-         inset-inline-start is the physical right, so setting it afterwards
-         was wiping the position we had just set */
-      bar.style.insetInlineEnd = 'auto'; bar.style.insetInlineStart = 'auto';
-      bar.style.insetBlockStart = 'auto'; bar.style.insetBlockEnd = 'auto';
-      bar.style.left = 'auto'; bar.style.top = 'auto';
-      bar.style.right = Math.max(6, Math.round(innerWidth - r.left + gap)) + 'px';
-      bar.style.bottom = Math.max(6, Math.round(innerHeight - r.bottom)) + 'px';
-      /* if that pushes it off the left edge, sit above the horn instead */
-      const b = bar.getBoundingClientRect();
-      if (b.left < 6) {
-        bar.style.right = Math.max(6, Math.round(innerWidth - r.right)) + 'px';
-        bar.style.bottom = Math.round(innerHeight - r.top + gap) + 'px';
-      }
-    } else {
-      bar.style.right = 'max(10px,env(safe-area-inset-right))';
-      bar.style.bottom = 'max(14px,env(safe-area-inset-bottom))';
-      bar.style.left = 'auto'; bar.style.top = 'auto';
-    }
-  }
-  addEventListener('resize', () => setTimeout(place, 60));
-  function paint(){
-    const G = (typeof GAME !== 'undefined') && GAME.G; if (!G) return;
-    const v = el('dpCCv'), b = el('dpCCb'); if (!v || !b) return;
-    const dp = G.dp || {};
-    const t = Math.round(dp.target || 40);
-    if (v.textContent !== String(t)) v.textContent = t;
-    b.classList.toggle('on', !!dp.cruise);
-    b.textContent = dp.cruise ? tr('CC ON','مثبّت') : 'CC';
-  }
   setInterval(hudControls, 250);
 })();
