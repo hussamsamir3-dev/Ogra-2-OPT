@@ -8,7 +8,7 @@
   function prefs(){ return Object.assign({}, defaults, S().set.driverPlus || {}); }
   const btn = (a,label) => `<button type="button" data-drive="${a}">${label}</button>`;
   let oldFocus, wasPaused, dialogG, uiClock=0, slowTime=0, frameEMA=16.7, lastDraw=0;
-  window.OGRA_BUILD = '2026-09-20-driver-plus-2';
+  window.OGRA_BUILD = '2026-09-20-driver-plus-3';
   const prep=prepSession;prepSession=function(G){
     const out=prep.apply(this,arguments);
     if(G.mode!=='attract'){
@@ -82,11 +82,13 @@
   addEventListener('click',e=>{const b=e.target.closest?.('[data-drive]');if(!b)return;e.preventDefault();e.stopImmediatePropagation();action(b.dataset.drive)},true);
   document.addEventListener('change',e=>{const key=e.target.dataset.pref;if(!Object.hasOwn(defaults,key))return;const p=prefs();p[key]=e.target.type==='checkbox'?e.target.checked:e.target.value;S().set.driverPlus=p;saveGame();quality()});
   addEventListener('keydown',e=>{
+    const key=typeof e.key==='string'?e.key.toLowerCase():'';
+    const tag=e.target&&typeof e.target.tagName==='string'?e.target.tagName:'';
     if(el('dpDialog')){
-      if(e.key==='Escape'){e.preventDefault();e.stopImmediatePropagation();close();return}
-      if(e.key==='Tab'){const items=[...el('dpDialog').querySelectorAll('button,input,select')],first=items[0],last=items.at(-1);if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus()}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus()}}
+      if(key==='escape'){e.preventDefault();e.stopImmediatePropagation();close();return}
+      if(key==='tab'){const items=[...el('dpDialog').querySelectorAll('button,input,select')],first=items[0],last=items.at(-1);if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus()}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus()}}
     }
-    if(e.key.toLowerCase()==='c'&&!e.repeat&&!/INPUT|TEXTAREA|SELECT/.test(e.target.tagName)&&GAME.state==='play'&&!GAME.paused){e.preventDefault();cruise()}
+    if(key==='c'&&!e.repeat&&!/INPUT|TEXTAREA|SELECT/.test(tag)&&GAME.state==='play'&&!GAME.paused){e.preventDefault();cruise()}
   },true);
   const toHub=UI.toHub;UI.toHub=function(){el('dpDialog')?.remove();return toHub.apply(this,arguments)};
   const show=UI.show;UI.show=function(name){const out=show.apply(this,arguments);if(name==='hub'){const dock=document.querySelector('.nsDock');if(dock&&!dock.querySelector('[data-drive]'))dock.insertAdjacentHTML('beforeend',btn('open','<span class="dpOrbit">◉</span><span>Driver+</span>'));quality()}return out};
