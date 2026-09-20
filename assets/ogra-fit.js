@@ -32,7 +32,9 @@
       const col = document.querySelector('#hud .h-tr');
       let bar = el('dpHud');
       if (!playing || !col) { if (bar) bar.remove(); return; }
-      if (!bar || bar.parentElement !== col) {
+      const phone = innerHeight <= 560 || innerWidth <= 900;
+      const host = phone ? document.body : col;
+      if (!bar || bar.parentElement !== host) {
         if (bar) bar.remove();
         bar = document.createElement('div'); bar.id = 'dpHud';
         bar.innerHTML =
@@ -43,7 +45,7 @@
              <button type="button" class="pn hb" data-dp="slower">−</button>
              <button type="button" class="pn hb" data-dp="cruise" id="dpCCb">CC</button>
            </div>`;
-        col.appendChild(bar);                       /* lives in the HUD column, so it stacks with the rest */
+        host.appendChild(bar);                      /* in the HUD column on a big screen, free-standing on a phone */
         bar.addEventListener('click', e => {
           const b = e.target.closest('[data-dp]'); if (!b) return;
           e.preventDefault(); e.stopPropagation();
@@ -56,9 +58,30 @@
           paint();
         });
       }
+      bar.classList.toggle('dpFloat', phone);
+      if (phone) parkPlace(); else { bar.style.cssText = ''; }
       paint();
     } catch(e) {}
   }
+
+  /* on a phone the bar sits just above the parking brake, clear of the pedals */
+  function parkPlace(){
+    const bar = el('dpHud'); if (!bar) return;
+    const anchor = document.getElementById('bHand') || document.getElementById('bPark');
+    const r = anchor && anchor.getBoundingClientRect();
+    /* logical insets first: in a right-to-left page inset-inline-start is the
+       physical right, and setting it later would wipe what we just applied */
+    bar.style.insetInlineStart = 'auto'; bar.style.insetInlineEnd = 'auto';
+    bar.style.insetBlockStart = 'auto'; bar.style.insetBlockEnd = 'auto';
+    bar.style.left = 'auto'; bar.style.top = 'auto';
+    if (r && r.width > 4) {
+      bar.style.right = Math.max(6, Math.round(innerWidth - r.right)) + 'px';
+      bar.style.bottom = Math.max(6, Math.round(innerHeight - r.top + 8)) + 'px';
+    } else {
+      bar.style.right = '10px'; bar.style.bottom = '84px';
+    }
+  }
+  addEventListener('resize', () => setTimeout(() => { try { parkPlace(); } catch(e) {} }, 80));
 
 
   function paint(){
