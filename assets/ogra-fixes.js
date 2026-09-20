@@ -73,6 +73,42 @@
   fixShop();
   setInterval(() => { if (!window.__ogShopFixed) fixShop(); }, 1500);   /* it is defined when a rest house opens */
 
+
+  /* ---------- 3b. the balance you SEE follows the balance you have ---------- */
+  (function money(){
+    const fmt = n => {
+      try { return (typeof money === 'function') ? money(n) : Math.round(n).toLocaleString('en-US'); }
+      catch(e) { return Math.round(n).toLocaleString('en-US'); }
+    };
+    /* the old helper took the largest of the local, server and on-screen figures,
+       so a purchase was immediately "corrected" back up by whichever was stale */
+    window.OG_cash = function(){ const s = S0(); return s ? (s.cash || 0) : 0; };
+
+    function refresh(){
+      try {
+        const s = S0(); if (!s) return;
+        const cash = Math.round(s.cash || 0), txt = cash.toLocaleString('en-US');
+        const w = document.getElementById('rhWallet');
+        if (w) {
+          const ar = (typeof LANG !== 'undefined' && LANG.cur === 'ar');
+          const line = (ar ? '💰 محفظتك: ' : '💰 Wallet: ') + txt + (ar ? ' ج' : ' EGP');
+          if (w.textContent !== line) w.textContent = line;
+        }
+        document.querySelectorAll('.tbCash, #topBar .tbCash, #hudCash, .cash.led, #hCash').forEach(el => {
+          const n = parseInt(String(el.textContent).replace(/[^\d]/g, ''), 10);
+          if (Number.isFinite(n) && n !== cash) el.textContent = el.textContent.replace(/[\d,\u0660-\u0669]+/, txt);
+        });
+      } catch(e) {}
+    }
+    setInterval(refresh, 400);
+    document.addEventListener('click', e => {
+      if (e.target.closest && e.target.closest('[data-rh]')) {
+        setTimeout(refresh, 30); setTimeout(refresh, 300); setTimeout(refresh, 900);
+        try { if (typeof saveGame === 'function') saveGame(); } catch(err) {}
+      }
+    }, true);
+  })();
+
   /* ---------- 4 & 5. fuel is kept between shifts ---------- */
   function keepFuel(G){
     try {
