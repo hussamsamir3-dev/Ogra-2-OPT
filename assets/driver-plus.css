@@ -146,3 +146,7 @@ html.ogShortScreen .nsHub p{font-size:calc(var(--ogText)*.9)!important}
   #dpHud.dpFloat button.hb{min-width:37px;min-height:37px;font-size:12.5px}
   #dpHud.dpFloat #dpCCv{font-size:12.5px}
 }
+
+
+/* the docked controls keep clear of the radio and pause buttons */
+#hud .h-tr #dpHud{width:100%;justify-content:flex-end;margin-top:10px;position:relative;z-index:63}

@@ -165,3 +165,112 @@
     };
   }
 })();
+
+/* ============================================================
+   Roadside shops · junctions · walk cycles · rounded gradients
+   ============================================================ */
+(() => {
+  'use strict';
+  const S0 = () => (typeof S === 'function') ? S() : null;
+
+  /* ---------- 1. every purchase leaves the wallet ----------
+     Online, a purchase was handed to the server and the local balance was
+     never touched, so shops on the road appeared to cost nothing. */
+  function wrapBuy(){
+    try {
+      if (!window.OGRA_NET || typeof OGRA_NET.buy !== 'function' || OGRA_NET.buy.__charges) return;
+      const _buy = OGRA_NET.buy.bind(OGRA_NET);
+      const priceOf = (kind, payload) => {
+        try {
+          if (payload && typeof payload.price === 'number') return payload.price;
+          if (kind === 'fuel' && payload && typeof payload.litres === 'number') {
+            const s = S0(), own = s && s.owned[payload.vehicleId], sp = own && (typeof vehById === 'function') && vehById(payload.vehicleId);
+            const E = (sp && typeof effSpec === 'function') ? effSpec(sp, own) : null;
+            const unit = (E && typeof FUEL !== 'undefined' && FUEL[E.fuelType]) ? FUEL[E.fuelType].price : 0;
+            return Math.round(payload.litres*unit);
+          }
+        } catch(e) {}
+        return 0;
+      };
+      const w = function(kind, payload){
+        const s = S0(), cost = priceOf(kind, payload);
+        if (s && cost > 0) { s.cash = Math.max(0, (s.cash || 0) - cost); try { saveGame(); } catch(e) {} }
+        const out = _buy(kind, payload);
+        try {
+          out && out.then && out.then(r => {
+            try {
+              if (r && typeof r.cash === 'number') s.cash = r.cash;          /* the server's figure wins if it sends one */
+              else if (r && !r.ok && cost > 0) s.cash = (s.cash || 0) + cost; /* refused: give it back */
+              saveGame(); if (UI && UI.refresh) UI.refresh();
+            } catch(e) {}
+          }).catch(() => {});
+        } catch(e) {}
+        return out;
+      };
+      w.__charges = true;
+      OGRA_NET.buy = w;
+    } catch(e) {}
+  }
+  wrapBuy(); setInterval(wrapBuy, 1500);
+
+  /* ---------- 2. no cross streets ---------- */
+  function noCross(G){
+    const W = G && G.world; if (!W) return;
+    ['isx','cross','tl'].forEach(k => { if (W[k] && W[k].length) W[k].length = 0; });
+    for (const o of (G.traffic || [])) if (o && (o.cross || o.turning)) o.__void = true;
+  }
+
+  /* ---------- 3. one walk cycle per person, start to finish ---------- */
+  const STRIDE = 1.55, FRAME = 6.2832/8;
+  function walk(list, dt){
+    for (const p of (list || [])) {
+      if (!p) continue;
+      if (p.__ph == null) {
+        p.__ph = Math.random()*6.2832;
+        /* the phase belongs to this person alone: other systems may not add to it */
+        try { Object.defineProperty(p, 'ph', {get(){ return p.__ph; }, set(){}, configurable:true}); } catch(e) {}
+      }
+      const v = Math.abs(p.v || 0);
+      let moving = v > .03;
+      if (moving) { p.__ph += Math.min(FRAME, (v*dt/STRIDE)*6.2832); p.face = p.v > 0 ? 1 : -1; }
+      else if (p.walkTo != null && Math.abs(p.walkTo - p.x) > .15) {
+        const dir = p.walkTo > p.x ? 1 : -1;
+        p.x += dir*1.05*dt; p.face = dir; moving = true;
+        p.__ph += Math.min(FRAME, (1.05*dt/STRIDE)*6.2832);
+      }
+      if (p.__ph > 62.83) p.__ph -= 62.83;
+      p.walk = moving;
+    }
+  }
+
+  /* ---------- 4. long, rounded gradients instead of straight ramps ---------- */
+  function rounded(W){
+    if (!W || W.__rounded || typeof W.elev !== 'function') return;
+    const raw = W.elev.bind(W);
+    const S6 = t => { t = Math.max(0, Math.min(1, t)); return t*t*t*(t*(t*6 - 15) + 10); };   /* smoothstep, second order */
+    W.elev = function(x){
+      /* a weighted blend over 90 m: the crests and dips keep their height but
+         arrive and leave on a curve rather than a corner */
+      let sum = 0, tot = 0;
+      for (let i = -45; i <= 45; i += 7.5) {
+        const w = S6(1 - Math.abs(i)/50) + .05, v = raw(x + i);
+        if (Number.isFinite(v)) { sum += v*w; tot += w; }
+      }
+      const v0 = raw(x);
+      return tot ? (sum/tot)*.82 + v0*.18 : v0;
+    };
+    W.__rounded = true;
+  }
+
+  if (typeof updateGame === 'function') {
+    const _ug = updateGame;
+    window.updateGame = updateGame = function(G, dt, inp){
+      const out = _ug.apply(this, arguments);
+      try {
+        const d = Math.min(dt, .05);
+        noCross(G); rounded(G && G.world); walk(G.walkers, d); walk(G.peds, d);
+      } catch(e) {}
+      return out;
+    };
+  }
+})();
